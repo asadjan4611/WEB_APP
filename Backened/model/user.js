@@ -1,73 +1,90 @@
 const mongoose = require("mongoose");
- const bcrypt= require("bcrypt");
- const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
 
- const userSchema = new mongoose.Schema({
-    name:{
-         type:String,
-        required:[true,"Please enter your name"]
+const userSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: [true, "Please enter your name!"],
+  },
+  email:{
+    type: String,
+    required: [true, "Please enter your email!"],
+  },
+  password:{
+    type: String,
+    required: [true, "Please enter your password"],
+    minLength: [4, "Password should be greater than 4 characters"],
+    select: false,
+  },
+  phoneNumber:{
+    type: Number,
+  },
+  addresses:[
+    {
+      country: {
+        type: String,
+      },
+      city:{
+        type: String,
+      },
+      address1:{
+        type: String,
+      },
+      address2:{
+        type: String,
+      },
+      zipCode:{
+        type: Number,
+      },
+      addressType:{
+        type: String,
+      },
+    }
+  ],
+  role:{
+    type: String,
+    default: "user",
+  },
+  avatar:{
+    public_id: {
+      type: String,
+      required: true,
     },
-    email:{
-        type:String,
-        required:[true,"Please enter your email"]
+    url: {
+      type: String,
+      required: true,
     },
-    passwword:{
-        type:String,
-        required:[true,"Please enter your password"],
-        minLength:[4,"password should be grater then 4 characters"],
-        select:false,
-    },
-    phoneNumber:{
-        type:String,
-    },
-    addresses:[
-        {
-            country:{
-
-            },
-            city:{
-                type:String
-            },
-            address1:{
-                type:String
-
-            },
-            address2:{
-                type:String
-
-            },
-            zipCode:{
-                type:Number
-
-            },
-            addressType:{
-                type:String
-                
-            }
-        }
-    ],
-    role:{
-        type:String,
-        default:"user"
-    },
-    avatar:{
-        public_id:{
-            type:String,
-            required:true
-        },
-    url:{
-        type:String,
-        required:true
-    },
-
  },
- 
  createdAt:{
-    type:Date,
-    default:Date.now
+  type: Date,
+  default: Date.now(),
  },
-resstPasswordToken:String,
-  restePassowrdTime:Date
+ resetPasswordToken: String,
+ resetPasswordTime: Date,
 });
 
- module.exports =mongoose.model("User",userSchema); 
+//  Hash password
+userSchema.pre("save", async function (next){
+  if(!this.isModified("password")){
+     return next();
+  }
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+//compare password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+}; 
+
+
+// jwt token
+userSchema.methods.getJwtToken = function () {
+  return jwt.sign({ id: this._id}, process.env.JWT_SECRET_KEY,{
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+};
+
+
+module.exports = mongoose.model("User", userSchema);

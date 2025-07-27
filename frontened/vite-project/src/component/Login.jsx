@@ -21,7 +21,7 @@ const Login = () => {
        }
       ).then((res)=>{
         toast.success(res.data.message);
-        naviagte("/")
+        naviagte("/homePage")
         // console.log(res.data.message)
       }).catch((err)=>{
         toast.error(err.response.data.message)

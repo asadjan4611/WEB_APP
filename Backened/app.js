@@ -1,19 +1,33 @@
 const express = require("express");
-const ErrorHandler = require("./utils/ErrorHandler");
+const ErrorHandler = require("./middleware/error");
 const app = express();
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const fileUpload = require("expres.fileupload")
+require("dotenv").config();
+
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(bodyParsee.urlEncoded({extended:true}));
-app.use(fileUpload({useTempFiles:true}));
+app.use(cors({
+    origin:"http://localhost:5173",
+     credentials: true,
+}));
+app.use("/",express.static("uploads"));
+app.use(bodyParser.urlencoded({extended:true}));
 
-//config
+
+
+//import Routes
+
+const user = require("./controller/user")
+app.use("/api/user",user);
+
+//config 
 
 if (process.env.NODE_ENV !== "PROD") {
     require("dotenv").config({
-        path:"/backened/config/.env"
+        path:"/config/.env"
     });
 }
 

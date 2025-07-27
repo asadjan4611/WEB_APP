@@ -17,12 +17,13 @@ if (process.env.NODE_ENV !== "PROD") {
 }
 
 //connect DB
-connectDatabase()
+ connectDatabase()
 //create server
 
-const server = app.listen(process.env.PORT ,()=>{
-    console.log("Server is running on port on 8000");
+const server = app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
+
 
 
 //unhandle promise rejextion
