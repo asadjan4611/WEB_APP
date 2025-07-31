@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import styles from '../style/style';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const naviagte = useNavigate();
+  const location = useLocation();
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
   const handleSubmit =async(e)=>{
@@ -21,7 +22,8 @@ const Login = () => {
        }
       ).then((res)=>{
         toast.success(res.data.message);
-        naviagte("/homePage")
+        naviagte("/homePage");
+        window.location.reload();
         // console.log(res.data.message)
       }).catch((err)=>{
         toast.error(err.response.data.message)

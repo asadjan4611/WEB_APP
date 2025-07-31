@@ -136,8 +136,10 @@ router.post("/login-user",AsyncCatchError(async(req,res,next)=>{
 router.get(
   "/getUser",isAuthorized,AsyncCatchError(async(req,res,next)=>{
   try {
+      console.log("Everything is okay in function at get");
+
      const user = await User.findById(req.user.id);
-     console.log(user)
+    //  console.log(user)
      if (!user) {
        return next(new ErrorHandler("Enter your email and password",500))
     
@@ -147,9 +149,10 @@ router.get(
         user,
 
       })
+      // console.log("Everything is okay in function at get");
   } catch (error) {
        return next(new ErrorHandler("Please login first",500))
-    
+      console.log(error)
   }
 }));
 
