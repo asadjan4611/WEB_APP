@@ -13,13 +13,19 @@ import NavBar from "./NavBar";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styles from "../../style/style";
-import  {backned_Url}  from "../../server.js";
+import { backned_Url } from "../../server.js";
+import Cart from "../Cart/Cart";
+import WishList from "../WishList/WishList";
 const Header = ({ activeHeading }) => {
-  const {isAuthunticated,user,loading} = useSelector((state)=>state.user);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  //  console.log("user info is",user)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openWishList, setOpenWishList] = useState(false);
+
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -42,12 +48,11 @@ const Header = ({ activeHeading }) => {
 
   return (
     <>
-      
-         <div className={`${styles.section}`}>
+      <div className={`${styles.section}`}>
         {/* first header */}
         <div className="h-[60px] my-[20px] flex justify-between items-center">
           {/* Logo */}
-          <div>
+          <div className="">
             <Link to={"/"}>
               <img
                 className="h-[30px] rounded-lg"
@@ -93,8 +98,8 @@ const Header = ({ activeHeading }) => {
             )}
           </div>
 
-          <div className={`${styles.button}`}>
-            <Link to={"/seller"}>
+          <div className={`${styles.button} rounded-md ml-2`}>
+            <Link to={"/shop-create"}>
               <h1 className="items-center flex text-white">
                 Become Seller <IoIosArrowForward className="ml-1" />
               </h1>
@@ -106,7 +111,7 @@ const Header = ({ activeHeading }) => {
       {/* seconf header */}
       <div
         className={`${
-          active === true ? "shadow:sm fixed top-8 left-0 z-10" : null
+          active === true ? "shadow:sm fixed top-0 left-0 z-10" : null
         } transition items-center justify-between h-[70px] w-full bg-[#3321c8] `}
       >
         <div
@@ -141,7 +146,7 @@ const Header = ({ activeHeading }) => {
           <div className="flex">
             {/* favourite order products */}
 
-            <div className={`${styles.noramlFlex}`}>
+            <div onClick={()=>setOpenWishList(true)} className={`${styles.noramlFlex}`}>
               <div className="relative w-fit cursor-pointer mr-[15px]">
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                 <span className="absolute m-0 p-0  top-0 right-0 bg-green-400   text-white font-mono leading-tight text-center text-[15px]  rounded-full w-4 h-4 flex items-center justify-center">
@@ -151,7 +156,7 @@ const Header = ({ activeHeading }) => {
             </div>
 
             {/* shopping cart products */}
-            <div className={`${styles.noramlFlex}`}>
+            <div onClick={()=>setOpenCart(true)} className={`${styles.noramlFlex}`}>
               <div className="relative w-fit cursor-pointer mr-[15px]">
                 <AiOutlineShoppingCart
                   size={30}
@@ -167,27 +172,38 @@ const Header = ({ activeHeading }) => {
 
             <div className={`${styles.noramlFlex}`}>
               <div className="relative w-fit cursor-pointer mr-[15px]">
-                {
-                  isAuthunticated ?(
-                           <Link to={"/login"}>
-                 <img
-                  className="h-[35px] w-[35]px] rounded-full"
-                 src={`${server.backned_Url}${user.avatar} `} alt="" />
-                </Link>
-                  ):(
-                     <Link to={"/login"}>
-                  <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
-                </Link>
-                  )
-                }
-               
-
+                {isAuthenticated ? (
+                  <Link to={"/profile"}>
+                    <img
+                      className="h-[35px] w-[35]px] rounded-full"
+                      src={`${backned_Url}/uploads/${user.avatar.url}`}
+                      alt="asad jan"
+                    />
+                  </Link>
+                ) : (
+                  <Link to={"/login"}>
+                    <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
+                  </Link>
+                )}
               </div>
             </div>
+
+            {/* cart open */}
+            {openCart ? <Cart setOpenCart={setOpenCart} /> : null
+            }
+
+
+            {/* wishList  open cart */}
+            
+            
+            {/* cart open */}
+            {
+            openWishList ? <WishList setOpenWishList={setOpenWishList} /> : null
+            }
+
           </div>
         </div>
       </div>
-  
     </>
   );
 };

@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../../style/style";
-import ProductCardDetails   from "../productCardDetails/productCardDetails";
+import ProductCardDetails   from "../productCardDetails/ProductCardDetails";
 import {AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart, AiOutlineShoppingCart, AiOutlineStar} from 'react-icons/ai'
 const ProductCard = ({ data }) => {
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
   const d = data.name;
   const product_name = d.replace(/\s+/g, "-");
+  // console.log("products-name is ",product_name);
 
   return (
     <>
       <div className="w-full h-[370px]  bg-amber-50  rounded-lg shadow:sm p-3 relative cursor-pointer">
         <div className="flex justify-end">
-        <Link to={`/product${product_name}`}>
+        <Link to={`/product/${product_name}`}>
           <img
             src={data.image_Url[0].url}
             className="object-contain w-full h-[170px]"
@@ -67,7 +68,7 @@ const ProductCard = ({ data }) => {
         <Link to={"/"}>
           <h1 className={`${styles.shop_name}`}>{data.shop.name}</h1>
         </Link>
-        <Link to={`/product/${data.product_name}`}>
+        <Link to={`/product/${product_name}`}>
           <h2 className="pb-5 font-[400]">
             {data.name.length > 40
               ? data.name.slice(0, 40) + "...."

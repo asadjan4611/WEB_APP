@@ -34,7 +34,8 @@ const Signup = () => {
     const res =await axios
       .post(`http://localhost:8000/api/user/create-user`, newForm, config);
       // console.log("Your response is ",res.data.message);
-      toast.success(res.data.message)
+      toast.success(res.data.message);
+      navigate("/login");
       
     } catch (err) {
        console.log("Error during signup:", err.response.data.message);

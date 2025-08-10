@@ -21,7 +21,11 @@ app.use(bodyParser.urlencoded({extended:true}));
 //import Routes
 
 const user = require("./controller/user")
+const shop = require("./controller/shop")
+
+
 app.use("/api/user",user);
+app.use("/api/shop",shop);
 
 //config 
 

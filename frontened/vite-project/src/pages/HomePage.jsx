@@ -7,7 +7,10 @@ import FeacturedProducts from "../component/Route/FeacturedProducts/FeacturedPro
 import EventCard from "../component/Route/EventCard/EventCard";
 import Sponsered from "../component/Route/Sponsered/Sponsered"
 import Footer from "../component/layout/Footer"
-const HomePage = () => {
+import { useSelector } from 'react-redux';
+ const HomePage = () => {
+//   const {isAuthenticated} = useSelector(state=>state.user);
+//   console.log("isAuth is true or not",isAuthenticated);
   return (
     <div>
       <Header activeHeading={1}/>

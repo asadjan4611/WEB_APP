@@ -60,6 +60,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
+    console.log(error.message)
     return next(new ErrorHandler(error.message, 400));
   }
 });
@@ -139,7 +140,7 @@ router.get(
       console.log("Everything is okay in function at get");
 
      const user = await User.findById(req.user.id);
-    //  console.log(user)
+      // console.log(user)
      if (!user) {
        return next(new ErrorHandler("Enter your email and password",500))
     
@@ -149,11 +150,33 @@ router.get(
         user,
 
       })
-      // console.log("Everything is okay in function at get");
+       console.log("Everything is okay in function at get");
   } catch (error) {
-       return next(new ErrorHandler("Please login first",500))
+       return next(new ErrorHandler(error.message,500))
       console.log(error)
   }
 }));
 
+
+//logout Route
+
+router.get("/logout",isAuthorized,AsyncCatchError(async(req,res,next)=>{
+  try {
+    console.log("welcome at logout function");
+    res.cookie("token","",{
+      expiresIn:new Date(Date.now),
+      httpOnly:true
+    })
+
+    res.status(200).json({
+      success :true,
+      message:"LogOut Sucessfully"
+    });
+
+    console.log("Bye from logout function");
+
+  } catch (error) {
+    return next(new ErrorHandler(error.message,500))
+  }
+}));
 module.exports = router;

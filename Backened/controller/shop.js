@@ -1,0 +1,129 @@
+const express = require("express");
+const Shop = require("../model/shop");
+const path = require("path");
+const router = express.Router();
+const { upload } = require("../multer");
+const ErrorHandler = require("../utils/ErrorHandler");
+const fs = require("fs");
+const jwt = require("jsonwebtoken");
+const AsyncCatchError = require("../middleware/catchAsyncError");
+const sendMail = require("../utils/sendMail");
+const { sendShopToken } = require("../utils/sendShopToken.js");
+const {isAuthorized}= require('../middleware/auth');
+
+
+
+
+router.post("/create-shop",upload.single("file"),async(req,res,next)=>{
+          try{
+         
+        console.log("welcome at create shop function");
+      const {email} = req.body;
+    const sellerEmail = await Shop.findOne({email});
+    if (sellerEmail) {
+        const filename = req.file.filename;
+              const filepath = `uploads/${filename}`;
+              fs.unlink(filepath, (err) => {
+                if (err) {
+                  return res.status(500).json({
+                    success:false,
+                    message: "Error deleting file" });
+                }
+                return res.status(400).json({ 
+                  success:false,
+                  message: "ShopEmail  is already exist" });
+              });
+              return;
+    }   
+
+    const filename = req.file.filename;
+    const fileUrl = path.join(filename);
+    console.log("hi");
+    
+        const seller = {
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          avatar: fileUrl,
+          phoneNumber:req.body.phoneNumber,
+          zipCode:req.body.zipCode,
+          address:req.body.address,
+
+        };
+
+    console.log("welcome at middle of  create shop function");
+
+         const activationToken = createActivationToken(seller);
+    const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
+         
+     try {
+          await sendMail({
+            email: seller.email,
+            subject: "Activate your Shop",
+            message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
+          });
+          res.status(200).json({
+            success: true,
+            message: `please check your email  to activate your shop`,
+          });
+        } catch (error) {
+          return next(new ErrorHandler(error.message, 500));
+        }
+    
+    } catch (error) {
+       return next(new ErrorHandler(error.message, 400)); 
+    }
+
+   
+});
+
+const createActivationToken = (seller) => {
+  return jwt.sign(seller, process.env.ACTIVATION_SECRET, {
+    expiresIn: "5m",
+  });
+};
+
+//activate seller
+
+router.post( "/seller/activation",
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      console.log("Welocome at activation function");
+       const { activation_token } = req.body;
+      console.log("activation_token is",activation_token);
+      const newUser = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_SECRET
+      );
+      console.log("successfully verified token");
+      if (!newUser) {
+        return next(new ErrorHandler("Invalid Token", 400));
+      }
+      const { name, email, password, avatar,phoneNumber,address,zipCode } = newUser;
+
+
+      let seller= await Shop.findOne({email});
+      if (!seller) {
+         return next(new ErrorHandler("Seller is already exist ", 400));
+      }
+
+       seller = await Shop.create({
+        name,
+        password,
+        email,
+        avatar,
+        phoneNumber,
+        address,
+        zipCode
+      });
+      console.log("shop is created successfully created in database now token is working");
+      console.log("send token is correctly working");
+      sendShopToken(seller,201, res);
+    } catch (error) {
+      console.log("the error of the activation () is ", error.message);
+      return next(new ErrorHandler(" Token is expired", 400));
+    }
+  })
+);
+
+module.exports = router

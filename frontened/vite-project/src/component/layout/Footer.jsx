@@ -12,7 +12,6 @@ import {
   footerSupportLinks,
 } from "../../static/data";
 const Footer = () => {
-  console.log(footerProductLinks);
   return (
     <div className={`bg-[#000] text-white`}>
       <div className="md:flex md:justify-between md:items-center sm:px-12 px-4 bg-[#342ac8] py-7">

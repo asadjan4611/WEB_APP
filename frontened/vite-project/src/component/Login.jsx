@@ -6,13 +6,16 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const Login = () => {
+
   const [email, setEmail] = useState('');
   const naviagte = useNavigate();
   const location = useLocation();
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
-  const handleSubmit =async(e)=>{
-      e.preventDefault();
+
+
+const handleSubmit=async(e)=>{
+          e.preventDefault();
       await axios.post(
        `http://localhost:8000/api/user/login-user`,{
         email,
@@ -22,15 +25,18 @@ const Login = () => {
        }
       ).then((res)=>{
         toast.success(res.data.message);
-        naviagte("/homePage");
-        window.location.reload();
+        naviagte("/homepage");
+        window.location.reload(true);
         // console.log(res.data.message)
       }).catch((err)=>{
         toast.error(err.response.data.message)
         //  console.log(err.response.data.message)
       });
+}
+
+       
    
-  }
+  
 
   return (
     <div className='min-h-screen bg-gray-100 flex-col flex justify-between py-12 sm:px-6 lg:px-8'>
@@ -140,6 +146,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Login;
