@@ -34,7 +34,7 @@ const Header = ({ activeHeading }) => {
       (product) =>
         product.name && product.name.toLowerCase().includes(term.toLowerCase())
     );
-    console.log("your filter data is ", filterData);
+    // console.log("your filter data is ", filterData);
     setSearchData(filterData);
   };
 

@@ -1,6 +1,6 @@
-const sendToken= (seller,statusCode,res) =>{
-    console.log("welcome at send token function");
-   const token =user.getJwtToken();
+const sendShopToken= (seller,statusCode,res) =>{
+    // console.log("welcome at send token function");
+   const token =seller.getJwtToken();
 
 //    console.log("your getJwtToken is given below",token)
 //    option for Cookies
@@ -13,11 +13,11 @@ res
 .status(statusCode)
 .cookie("seller_token",token,options)
 .json({
-    message:"successfully verified user",
+    message:"successfully verified seller",
     success:true,
-    user,
+    seller,
     token
 })
 }
 
-module.exports = {sendToken}
+module.exports = {sendShopToken}

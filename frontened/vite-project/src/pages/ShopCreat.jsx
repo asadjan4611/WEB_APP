@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import styles from "../style/style";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { RxAvatar } from "react-icons/rx";
+import styles from "../style/style";
 
 const ShopCreate = () => {
   const naviagte = useNavigate();
@@ -44,18 +44,18 @@ const ShopCreate = () => {
       .post(`http://localhost:8000/api/shop/create-shop`, newForm, config);
       // console.log("Your response is ",res.data.message);
       toast.success(res.data.message);
-      naviagte("/homepage");
+       naviagte("/shop-login");
       
     } catch (err) {
        console.log("Error during signup:", err.response.data.message);
        toast.error(err);
-      //  setAvatar("");
-      //  setEmail("");
-      //  setName("");
-      //  setPassword("");
-      //  setAddress("");
-      //  setZipCode("");
-      //  setName("");
+       setAvatar("");
+       setEmail("");
+       setName("");
+       setPassword("");
+       setAddress("");
+       setZipCode("");
+       setName("");
     }
   };
 
@@ -261,7 +261,7 @@ const ShopCreate = () => {
               </button>
             </div>
 
-            {/* Signup Link */}
+            {/* login Link */}
             <div className={`${styles.noramlFlex} w-full`}>
               <h1>Already have an account?</h1>
               <Link to="/shop-login" className="text-blue-600 pl-2">

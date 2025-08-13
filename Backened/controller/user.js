@@ -9,9 +9,8 @@ const jwt = require("jsonwebtoken");
 const AsyncCatchError = require("../middleware/catchAsyncError");
 const sendMail = require("../utils/sendMail");
 const { sendToken } = require("../utils/sendToken");
-const {isAuthorized}= require('../middleware/auth');
+const { isAuthorized } = require("../middleware/auth");
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
-
   try {
     const { name, email, password } = req.body;
 
@@ -22,12 +21,14 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       fs.unlink(filepath, (err) => {
         if (err) {
           return res.status(500).json({
-            success:false,
-            message: "Error deleting file" });
+            success: false,
+            message: "Error deleting file",
+          });
         }
-        return res.status(400).json({ 
-          success:false,
-          message: "Users is already exist" });
+        return res.status(400).json({
+          success: false,
+          message: "Users is already exist",
+        });
       });
       return;
     }
@@ -39,10 +40,6 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       name: name,
       email: email,
       password: password,
-      avatar: {
-        url: fileUrl,
-        public_id: filename,
-      },
     };
     const activationToken = createActivationToken(user);
     const activationUrl = `http://localhost:5173/activation/${activationToken}`;
@@ -60,7 +57,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     return next(new ErrorHandler(error.message, 400));
   }
 });
@@ -75,7 +72,8 @@ const createActivationToken = (user) => {
 
 //activate user
 
-router.post( "/activation",
+router.post(
+  "/activation",
   AsyncCatchError(async (req, res, next) => {
     try {
       console.log("Welocome at activatin function");
@@ -105,78 +103,80 @@ router.post( "/activation",
   })
 );
 
+router.post(
+  "/login-user",
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
 
-router.post("/login-user",AsyncCatchError(async(req,res,next)=>{
-  try {
-    const {email,password} = req.body;
-  
-    if (!email && !password) {
-      return next(new ErrorHandler("Enter your email and password",403))
+      if (!email && !password) {
+        return next(new ErrorHandler("Enter your email and password", 403));
+      }
+
+      const findUser = await User.findOne({ email }).select("+password");
+      if (!findUser) {
+        return next(new ErrorHandler("User is not exist in Database", 402));
+      }
+
+      const isValidPassowrd = await findUser.comparePassword(password);
+      if (!isValidPassowrd) {
+        return next(new ErrorHandler("Please provide valid information", 402));
+      }
+
+      sendToken(findUser, 200, res);
+    } catch (error) {
+      // console.log(error);
+      return next(new ErrorHandler("Enter your email and password", 500));
     }
-    
-    const findUser = await User.findOne({email}).select("+password")
-    if (!findUser) {
-      return next(new ErrorHandler("User is not exist in Database",402))
-      
-    }
-
-    const isValidPassowrd = await findUser.comparePassword(password);
-    if (!isValidPassowrd) {
-      return next(new ErrorHandler("Please provide valid information",402))
-    }
-
-    sendToken(findUser,200,res);
-  } catch (error) {
-    // console.log(error);
-       return next(new ErrorHandler("Enter your email and password",500))
-  }
-
-}));
-
+  })
+);
 
 router.get(
-  "/getUser",isAuthorized,AsyncCatchError(async(req,res,next)=>{
-  try {
+  "/getUser",
+  isAuthorized,
+  AsyncCatchError(async (req, res, next) => {
+    try {
       console.log("Everything is okay in function at get");
 
-     const user = await User.findById(req.user.id);
+      const user = await User.findById(req.user.id);
       // console.log(user)
-     if (!user) {
-       return next(new ErrorHandler("Enter your email and password",500))
-    
-     }
-       res.status(201).json({
-        success:true,
+      if (!user) {
+        return next(new ErrorHandler("Enter your email and password", 500));
+      }
+      res.status(201).json({
+        success: true,
         user,
-
-      })
-       console.log("Everything is okay in function at get");
-  } catch (error) {
-       return next(new ErrorHandler(error.message,500))
-      console.log(error)
-  }
-}));
-
+      });
+      console.log("Everything is okay in function at get");
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+      console.log(error);
+    }
+  })
+);
 
 //logout Route
 
-router.get("/logout",isAuthorized,AsyncCatchError(async(req,res,next)=>{
-  try {
-    console.log("welcome at logout function");
-    res.cookie("token","",{
-      expiresIn:new Date(Date.now),
-      httpOnly:true
-    })
+router.get(
+  "/logout",
+  isAuthorized,
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      console.log("welcome at logout function");
+      res.cookie("token", "", {
+        expiresIn: new Date(Date.now),
+        httpOnly: true,
+      });
 
-    res.status(200).json({
-      success :true,
-      message:"LogOut Sucessfully"
-    });
+      res.status(200).json({
+        success: true,
+        message: "LogOut Sucessfully",
+      });
 
-    console.log("Bye from logout function");
-
-  } catch (error) {
-    return next(new ErrorHandler(error.message,500))
-  }
-}));
+      console.log("Bye from logout function");
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
 module.exports = router;

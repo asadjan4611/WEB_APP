@@ -23,3 +23,28 @@ export const loadUser = async (dispatch) => {
     });
   }
 };
+
+
+export const loadSeller = async (dispatch) => {
+  // console.log("Welcome at load user function")
+  try {
+    dispatch({
+      type: "loadSellerRequest",
+    });
+    // console.log("Welcome at load user function before api")
+
+    const res = await axios.get(`http://localhost:8000/api/shop/getSeller`, {
+      withCredentials: true,
+    });
+    // console.log("res is ",res.data.user)
+    dispatch({
+      type: "loadSellerSucessfully",
+      payload: res.data.seller,
+    });
+  } catch (error) {
+    dispatch({
+      type: "loadSellerFailure",
+      payload: error.data?.response.message,
+    });
+  }
+};

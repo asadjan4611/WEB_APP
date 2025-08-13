@@ -9,72 +9,70 @@ const jwt = require("jsonwebtoken");
 const AsyncCatchError = require("../middleware/catchAsyncError");
 const sendMail = require("../utils/sendMail");
 const { sendShopToken } = require("../utils/sendShopToken.js");
-const {isAuthorized}= require('../middleware/auth');
+const { isAuthorized, isSeller } = require("../middleware/auth");
+const bcrypt = require("bcrypt");
 
-
-
-
-router.post("/create-shop",upload.single("file"),async(req,res,next)=>{
-          try{
-         
-        console.log("welcome at create shop function");
-      const {email} = req.body;
-    const sellerEmail = await Shop.findOne({email});
+router.post("/create-shop", upload.single("file"), async (req, res, next) => {
+  try {
+    // console.log("welcome at create shop function");
+    const { email } = req.body;
+    const sellerEmail = await Shop.findOne({ email });
     if (sellerEmail) {
-        const filename = req.file.filename;
-              const filepath = `uploads/${filename}`;
-              fs.unlink(filepath, (err) => {
-                if (err) {
-                  return res.status(500).json({
-                    success:false,
-                    message: "Error deleting file" });
-                }
-                return res.status(400).json({ 
-                  success:false,
-                  message: "ShopEmail  is already exist" });
-              });
-              return;
-    }   
+      const filename = req.file.filename;
+      const filepath = `uploads/${filename}`;
+      fs.unlink(filepath, (err) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Error deleting file",
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: "ShopEmail  is already exist",
+        });
+      });
+      return;
+    }
 
     const filename = req.file.filename;
     const fileUrl = path.join(filename);
-    console.log("hi");
-    
-        const seller = {
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          avatar: fileUrl,
-          phoneNumber:req.body.phoneNumber,
-          zipCode:req.body.zipCode,
-          address:req.body.address,
+    // console.log("hi");
 
-        };
+    const seller = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      avatar: {
+        url: fileUrl,
+        public_id: filename,
+      },
+      phoneNumber: req.body.phoneNumber,
+      zipCode: req.body.zipCode,
+      address: req.body.address,
+    };
 
-    console.log("welcome at middle of  create shop function");
+    // console.log("welcome at middle of  create shop function");
 
-         const activationToken = createActivationToken(seller);
+    const activationToken = createActivationToken(seller);
     const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
-         
-     try {
-          await sendMail({
-            email: seller.email,
-            subject: "Activate your Shop",
-            message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
-          });
-          res.status(200).json({
-            success: true,
-            message: `please check your email  to activate your shop`,
-          });
-        } catch (error) {
-          return next(new ErrorHandler(error.message, 500));
-        }
-    
-    } catch (error) {
-       return next(new ErrorHandler(error.message, 400)); 
-    }
 
-   
+    try {
+      await sendMail({
+        email: seller.email,
+        subject: "Activate your Shop",
+        message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
+      });
+      res.status(200).json({
+        success: true,
+        message: `please check your email  to activate your shop`,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 400));
+  }
 });
 
 const createActivationToken = (seller) => {
@@ -85,45 +83,99 @@ const createActivationToken = (seller) => {
 
 //activate seller
 
-router.post( "/seller/activation",
+router.post(
+  "/seller/activation",
   AsyncCatchError(async (req, res, next) => {
     try {
-      console.log("Welocome at activation function");
-       const { activation_token } = req.body;
-      console.log("activation_token is",activation_token);
+      const { activation_token } = req.body;
       const newUser = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET
       );
-      console.log("successfully verified token");
       if (!newUser) {
         return next(new ErrorHandler("Invalid Token", 400));
       }
-      const { name, email, password, avatar,phoneNumber,address,zipCode } = newUser;
+      const { name, email, password, avatar, phoneNumber, address, zipCode } =
+        newUser;
 
-
-      let seller= await Shop.findOne({email});
-      if (!seller) {
-         return next(new ErrorHandler("Seller is already exist ", 400));
+      const findseller = await Shop.findOne({ email });
+      if (findseller) {
+        return next(
+          new ErrorHandler("your current  Seller is already exist ", 400)
+        );
       }
 
-       seller = await Shop.create({
+      const seller = await Shop.create({
         name,
         password,
         email,
         avatar,
         phoneNumber,
         address,
-        zipCode
+        zipCode,
       });
-      console.log("shop is created successfully created in database now token is working");
-      console.log("send token is correctly working");
-      sendShopToken(seller,201, res);
+      sendShopToken(seller, 201, res);
     } catch (error) {
-      console.log("the error of the activation () is ", error.message);
+      //   console.log("the error of the activation () is ", error.message);
       return next(new ErrorHandler(" Token is expired", 400));
     }
   })
 );
 
-module.exports = router
+
+router.post(
+  "/shop-login",
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email && !password) {
+        return next(new ErrorHandler("Enter your email and password", 403));
+      }
+
+      const findShop = await Shop.findOne({ email }).select("+password");
+      if (!findShop) {
+        return next(new ErrorHandler("Shop is not exist in Database", 402));
+      }
+
+      const isValidPassowrd = await findShop.comparePassword(password);
+      if (!isValidPassowrd) {
+        return next(new ErrorHandler("Please provide valid information", 402));
+      }
+
+      sendShopToken(findShop, 200, res);
+    } catch (error) {
+      // console.log(error);
+      return next(new ErrorHandler("Enter your valid email and password", 500));
+    }
+  })
+);
+
+
+router.get(
+  "/getSeller",
+  isSeller,
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      // console.log("Everything is okay in Authfunction and now is at get");
+
+      const seller = await Shop.findById(req.user.id);
+      //  console.log(seller)
+      if (!seller) {
+        return next(new ErrorHandler("Please login your shop", 500));
+      }
+      res.status(201).json({
+        success: true,
+        seller,
+      });
+      // console.log("Everything is okay in function at get");
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+      console.log(error);
+    }
+  })
+);
+
+
+
+module.exports = router;

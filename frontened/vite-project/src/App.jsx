@@ -1,5 +1,12 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   LoginPage,
   SignUpPage,
@@ -13,67 +20,104 @@ import {
   ProfilePage,
   CheckOutPage,
   SellerActivationPage,
-  ShopCreate
 } from "./Routes";
+import {
+  ShopCreate,
+  ShopLoginPage,
+  ShopHomePage,
+  DashboardScreen,
+} from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
-import { loadUser } from "./assets/redux/actions/user";
+import { loadSeller, loadUser } from "./assets/redux/actions/user";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
-function App() {
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
-  const user = useSelector((state) => state.user);
+import ShopProtectedRoute from "./ShopProtectedRoute/ShopProtectedRoute.jsx";
 
+function App() {
   const dispatch = useDispatch();
   const location = useLocation();
+
   useEffect(() => {
-    // const noRoutes=["/login","sign-up"];
-    // if(noRoutes.includes(location.pathname)) return ;
-    loadUser(dispatch);
-  }, [location.pathname]);
+    // Skip auth routes where loading isn't needed
+    // const noAuthRoutes = ["/login", "/sign-up", "/"];
+    // if (noAuthRoutes.includes(location.pathname)) return;
+
+    // Get tokens from cookies
+    const token = Cookies.get("token");
+    const sellerToken = Cookies.get("seller_token");
+
+    if (token && !sellerToken) {
+      // dispatch(setUser(null)); // Triggers user loading
+      loadUser(dispatch);
+    } else if (sellerToken) {
+      // dispatch(setSeller(null)); // Triggers seller loading
+      loadSeller(dispatch);
+    }
+  }, [location.pathname, dispatch]);
 
   return (
     <>
-      {loading ? null : (
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/sign-up" element={<SignUpPage />} />
-          <Route
-            path="/activation/:activation_token"
-            element={<ActivationPage />}
-          />
-          <Route
-            path="/activation/seller/:activation_token"
-            element={<SellerActivationPage />}
-          />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/product/:name" element={<ProductDetailPage />} />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+        <Route
+          path="/activation/:activation_token"
+          element={<ActivationPage />}
+        />
+        <Route
+          path="/activation/seller/:activation_token"
+          element={<SellerActivationPage />}
+        />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/product/:name" element={<ProductDetailPage />} />
 
-          <Route path="/best-selling" element={<BestSelling />} />
-          <Route path="/events" element={<EventPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+        <Route path="/best-selling" element={<BestSelling />} />
+        <Route path="/events" element={<EventPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
 
-           <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <CheckOutPage />
-              </ProtectedRoute>
-            }
-          />
-            <Route path="/homepage" element={<HomePage />} />
-          <Route path="/shop-create" element={<ShopCreate />} />
+          <CheckOutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/homepage" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
 
-        </Routes>
-      )}
+        {/* Shop Routes */}
+        <Route path="/shop-create" element={<ShopCreate />} />
+        <Route path="/shop-login" element={<ShopLoginPage />} />
+        {/* <Route path="/dashboard" element={<DashboardScreen />} /> */}
+
+        <Route
+          path="/shop/:id"
+          element={
+            <ShopProtectedRoute>
+              <ShopHomePage />
+            </ShopProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ShopProtectedRoute>
+              <DashboardScreen />
+            </ShopProtectedRoute>
+          }
+        />
+      </Routes>
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
