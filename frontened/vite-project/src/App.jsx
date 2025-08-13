@@ -20,6 +20,8 @@ import {
   ProfilePage,
   CheckOutPage,
   SellerActivationPage,
+  OrderSucessPage,
+  PaymentPage
 } from "./Routes";
 import {
   ShopCreate,
@@ -65,14 +67,12 @@ function App() {
           path="/activation/:activation_token"
           element={<ActivationPage />}
         />
-        <Route
-          path="/activation/seller/:activation_token"
-          element={<SellerActivationPage />}
-        />
+        
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:name" element={<ProductDetailPage />} />
-
+        <Route path="/order/success/:id" element={<OrderSucessPage />} />
         <Route path="/best-selling" element={<BestSelling />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/events" element={<EventPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route
@@ -87,7 +87,6 @@ function App() {
           path="/checkout"
           element={
             <ProtectedRoute>
-
           <CheckOutPage />
             </ProtectedRoute>
           }
@@ -98,8 +97,11 @@ function App() {
         {/* Shop Routes */}
         <Route path="/shop-create" element={<ShopCreate />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
-        {/* <Route path="/dashboard" element={<DashboardScreen />} /> */}
-
+        {/* <Route path="/dashboard" element={<DashboardScreen />} /> */} 
+         <Route
+          path="/activation/seller/:activation_token"
+          element={<SellerActivationPage />}
+        />
         <Route
           path="/shop/:id"
           element={
