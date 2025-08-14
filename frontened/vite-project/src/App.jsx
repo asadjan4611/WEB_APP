@@ -103,7 +103,7 @@ function App() {
           element={<SellerActivationPage />}
         />
         <Route
-          path="/shop/:id"
+          path="/seller/:id"
           element={
             <ShopProtectedRoute>
               <ShopHomePage />
