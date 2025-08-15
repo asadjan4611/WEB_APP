@@ -22,9 +22,11 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 const user = require("./controller/user")
 const shop = require("./controller/shop")
+const product = require("./controller/product")
 
 
 app.use("/api/user",user);
+app.use("/api/product",product);
 app.use("/api/shop",shop);
 
 //config 

@@ -28,6 +28,8 @@ import {
   ShopLoginPage,
   ShopHomePage,
   DashboardScreen,
+  ShopCreateProduct,
+  ShopAllProducts
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
@@ -115,6 +117,22 @@ function App() {
           element={
             <ShopProtectedRoute>
               <DashboardScreen />
+            </ShopProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard-create-product"
+          element={
+            <ShopProtectedRoute>
+              <ShopCreateProduct />
+            </ShopProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard-products"
+          element={
+            <ShopProtectedRoute>
+              <ShopAllProducts />
             </ShopProtectedRoute>
           }
         />

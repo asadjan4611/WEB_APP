@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
     const filename = path.basename(file.originalname, ext).replace(/\s+/g, '-');
     
     console.log("Processing file:", filename);
-    cb(null, `${filename}-${uniqueSuffix}${ext || '.png'}`);
+    cb(null, `${filename}-${uniqueSuffix}${ext || '.png' || ".jpeg"}`);
   }
 });
 
