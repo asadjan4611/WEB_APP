@@ -40,6 +40,10 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       name: name,
       email: email,
       password: password,
+       avatar: {
+        url: fileUrl,
+        public_id: filename,
+      },
     };
     const activationToken = createActivationToken(user);
     const activationUrl = `http://localhost:5173/activation/${activationToken}`;
@@ -86,15 +90,11 @@ router.post(
       if (!newUser) {
         return next(new ErrorHandler("Invalid Token", 400));
       }
-      const { name, email, password, avatar } = newUser;
-      const user = await User.create({
-        name,
-        password,
-        email,
-        avatar,
-      });
+      // console.log(newUser);
+      // const { name, email, password, avatar } = newUser;
+      const user = await User.create(newUser);
 
-      console.log("send token is correctly working");
+      // console.log("send token is correctly working");
       sendToken(user, 201, res);
     } catch (error) {
       console.log("the error of the activation () is ", error.message);

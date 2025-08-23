@@ -122,7 +122,7 @@ router.post(
   })
 );
 
-
+// shop login
 router.post(
   "/shop-login",
   AsyncCatchError(async (req, res, next) => {
@@ -151,7 +151,7 @@ router.post(
   })
 );
 
-
+//get all products of the user
 router.get(
   "/getSeller",
   isSeller,
@@ -176,6 +176,26 @@ router.get(
   })
 );
 
+// shop-user logout functionlaity
 
+router.get(
+  "/logout-seller",
+  isSeller,
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      console.log("Welocme at logout function");
+    res.cookie("seller_token", "", {
+      expiresIn: new Date(Date.now),
+      httpOnly: true,
+    });
+    res.status(200).json({
+      message:"Logout sucessfully"
+    });
+    } catch (error) {
+      return next(new ErrorHandler(error,400 ));
+    }
+    
+  })
+);
 
 module.exports = router;

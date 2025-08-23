@@ -8,7 +8,7 @@ import { BiMessageSquareDetail } from "react-icons/bi";
 import { backned_Url } from "../../../server";
 const DashoardHeader = () => {
   const { seller,isSeller } = useSelector((state) => state.seller);
-  console.log(seller);
+  // console.log(seller);
   return (
     <div className="w-full h-[80px] shadow sticky top-0 left-0 flex items-center justify-between px-4">
       <div>

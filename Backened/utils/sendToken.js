@@ -1,5 +1,5 @@
 const sendToken= (user,statusCode,res) =>{
-    console.log("welcome at send token function");
+    // console.log("welcome at send token function");
    const token =user.getJwtToken();
 
 //    console.log("your getJwtToken is given below",token)

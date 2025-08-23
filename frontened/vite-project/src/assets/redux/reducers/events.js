@@ -3,48 +3,48 @@ import { createReducer } from "@reduxjs/toolkit";
 const initialState={
     isLoading:true,
     error:null,
-    product:null,
-    products:[],
+    event:null,
+    events:[],
     success :false,
     message:null
 }
 
-export const productReducer = createReducer(initialState,(builder)=>{
+export const eventReducer = createReducer(initialState,(builder)=>{
     builder
     .addCase(
-   "productCreateRequest",(state)=>{
+   "eventCreateRequest",(state)=>{
     state.isLoading=true;
    })
-   .addCase("productCreateSuccess",(state,action)=>{
+   .addCase("eventCreateSuccess",(state,action)=>{
     state.isLoading=false;
-    state.product=action.payload;
+    state.event=action.payload;
     state.success=true
    })
-   .addCase("productCreateFailure",(state,action)=>{
+   .addCase("eventCreateFailure",(state,action)=>{
       state.isLoading=false;
     state.error=action.payload;
     state.success=false
    }).addCase(
-    "getAllProductsRequest",(state,action)=>{
+    "getAllEventRequest",(state,action)=>{
       state.isLoading=true;
     }
    )
-   .addCase("getAllProductsSuccess",(state,action)=>{
+   .addCase("getAllEventsSuccess",(state,action)=>{
     state.isLoading=false;
-    state.products = action.payload;
+    state.events = action.payload;
    }).
-   addCase("getAllProductsFailure",(state,action)=>{
+   addCase("getAllEventsFailure",(state,action)=>{
     state.isLoading=false;
     state.error=action.payload;
    }).
-   addCase("deleteProductRequest",(state)=>{
+   addCase("deleteEventRequest",(state)=>{
         state.isLoading= false;
    }).
-   addCase("deleteProductSucessfully",(state,action)=>{
+   addCase("deleteEventSucessfully",(state,action)=>{
          state.isLoading= false;
         state.message=action.payload
    }).
-   addCase("deleteProductFailure",(state,action)=>{
+   addCase("deleteEventFailure",(state,action)=>{
         state.isLoading= false;
         state.error=action.payload
    })

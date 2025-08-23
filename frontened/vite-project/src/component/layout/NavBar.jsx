@@ -9,7 +9,7 @@ const NavBar = ({active}) => {
       {
         naviItems && naviItems.map((i,index)=>(
           <div key={index} className='flex'>
-            <Link to={"/i"} className={`${active === index+1} ? "text-[#17dd1f] : "text-green font-[600] px-6 cursor-pointer"` } >
+            <Link to={i.url} className={`${active === index+1} ? "text-[#17dd1f] : "text-green font-[600] px-6 cursor-pointer"` } >
             {i.title}
             </Link>
           </div>

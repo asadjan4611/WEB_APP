@@ -2,11 +2,21 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { server } from "../../folder/server";
 import styles from "../../style/style";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const ShopInfo = ({isOwner}) => {
 
- const logoutHander =() =>{
-    
+ const logoutHander =async() =>{
+    try {
+      const res= await axios.get(`http://localhost:8000/api/shop/logout-seller`);
+      if (res.data === "success") {
+        <Navigate to={"/login-shop"}/>
+      }
+    } catch (error) {
+      toast.error(error)
+    }
  }
 
   const { seller } = useSelector((state) => state.seller);

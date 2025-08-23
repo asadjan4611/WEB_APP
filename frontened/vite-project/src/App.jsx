@@ -29,7 +29,9 @@ import {
   ShopHomePage,
   DashboardScreen,
   ShopCreateProduct,
-  ShopAllProducts
+  ShopAllProducts,
+  ShopCreateEvent,
+  ShopAllEvents
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
@@ -136,7 +138,27 @@ function App() {
             </ShopProtectedRoute>
           }
         />
+
+        <Route
+          path="/dashboard-create-event"
+          element={
+            <ShopProtectedRoute>
+              <ShopCreateEvent />
+            </ShopProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard-events"
+          element={
+            <ShopProtectedRoute>
+              <ShopAllEvents />
+            </ShopProtectedRoute>
+          }
+        />
       </Routes>
+
+      
 
       <ToastContainer
         position="top-right"

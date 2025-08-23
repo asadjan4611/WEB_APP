@@ -5,13 +5,14 @@ const AsyncCatchError = require("../middleware/catchAsyncError");
 const Shop = require("../model/shop");
 const { upload } = require("../multer");
 const ErrorHandler = require("../utils/ErrorHandler");
+const fs = require("fs");
 //create  a product
 router.post(
   "/create-product",
   upload.array("images"),
   AsyncCatchError(async (req, res, next) => {
     try {
-        console.log("Product is:", Product);
+        // console.log("Product is:", Product);
 
       console.log("welocme at create product function");
       const shopeIdObj = req.body;
@@ -32,7 +33,7 @@ router.post(
         // console.log(cleanProductData);
         // const product = await Product.create(cleanProductData);
         const product = await Product.create(productData);
-        // console.log("product is correcly created ", product);
+        console.log("product is correcly created ", product);
         res.status(201).json({
           success: true,
           product,
@@ -61,4 +62,44 @@ router.post(
         return next(new ErrorHandler(error,400))
      }
  }));
-module.exports = router;
+ 
+ 
+ // delete an products
+ 
+ router.delete("/delete-shop-product/:id",AsyncCatchError (async(req,res,next)=>{
+   try {
+        console.log("welocome at function of deleting the product");
+        const productId = req.params.id;
+        const productData = await Product.findById(productId);
+        // console.log(product.images);
+  
+        productData.images.forEach((imageUrl) => {
+          const filename = imageUrl;
+          const filepath=`../uploads/${filename}`
+          // console.log(filepath);
+          fs.unlink(filepath,(err)=>{
+            console.log(err)
+          });
+          
+        });
+        console.log("everything is okay")
+
+        if (!productData) {
+          return next( new ErrorHandler("product is not exist",400));  
+        }
+        // const product = await Product.findByIdAndDelete(productId);
+        // res.status(200).json({
+        //     success :true,
+        //     "message":"Delete the product sucessfully"
+        //  });
+        } catch (error) {
+          return next( new ErrorHandler(error,400));  
+    }
+  }));
+
+
+
+
+
+  
+  module.exports = router;

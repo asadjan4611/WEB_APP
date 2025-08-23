@@ -31,7 +31,6 @@ exports.isAuthorized = (AsyncCatchError(async(req,res,next)=>{
 
 exports.isSeller = (AsyncCatchError(async(req,res,next)=>{
   console.log("Welcome at isSeller  function")
-         
          const tokenObj = req.cookies;
          const token  = tokenObj.seller_token;
         console.log("token is ",token);
