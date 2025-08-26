@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { backned_Url } from "../../server";
 import { AiOutlineArrowRight, AiOutlineCamera, AiOutlineDelete } from "react-icons/ai";
 import styles from "../../style/style";
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { MdOutlineAudiotrack, MdOutlineTrackChanges } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { backned_Url } from "../../serverRoute";
 const ProfileContent = ({ active }) => {
   const { user } = useSelector((state) => state.user);
   const [name, setName] = useState(user && user.name);

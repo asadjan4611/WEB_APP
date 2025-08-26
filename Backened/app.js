@@ -24,11 +24,15 @@ const user = require("./controller/user")
 const shop = require("./controller/shop")
 const product = require("./controller/product")
 const event = require("./controller/event");
+const coupan = require("./controller/couponCode");
+
 
 app.use("/api/user",user);
 app.use("/api/product",product);
 app.use("/api/shop",shop);
 app.use("/api/event",event);
+app.use("/api/coupan",coupan);
+
 
 //config 
 

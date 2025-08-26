@@ -18,9 +18,9 @@ const AllProducts = () => {
   },[dispatch]);
 
   const handleDelete = (params)=>{
-    console.log(params);
+    // console.log(params);
     dispatch(deleteProduct(params));
-  // window.location.reload();
+   window.location.reload();
   }
   
    const columns=[

@@ -6,6 +6,8 @@ const Event = require("../model/event");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const { upload } = require("../multer");
 const { isSeller } = require("../middleware/auth");
+const path = require("path");
+const fs = require("fs");
 //create  an event
 router.post(
   "/create-event",
@@ -49,10 +51,10 @@ router.get(
   "/get-all-events-shop/:id",
   catchAsyncError(async (req, res, next) => {
     try {
-      const shopeId = req.params.id
+      const shopeId = req.params.id;
       // console.log(shopId);
-      const events = await Event.find({shopeId});
-        // console.log(events);
+      const events = await Event.find({ shopeId });
+      // console.log(events);
       res.json({
         success: true,
         events,
@@ -68,26 +70,65 @@ router.get(
 
 router.delete(
   "/delete-shop-event/:id",
-  isSeller,
+  // isSeller,
   catchAsyncError(async (req, res, next) => {
     try {
+      console.log("welocme at delete function");
       const eventId = req.params.id;
-      const eventData = await Event.find({ eventId });
-     console.log(eventData)
+      // console.log(eventId)
+      const eventData = await Event.findById(eventId);
+
+      eventData.images.forEach((imageUrl) => {
+        const filepath = path.join(process.cwd(), "uploads", imageUrl);
+
+        fs.unlink(filepath, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("deletdd file successfull", filepath);
+          }
+        });
+      });
+      //  console.log(eventData)
       if (!eventData) {
         return next(new ErrorHandler("Event is not find", 400));
       }
-       console.log("everything is okay at delete the event") 
+      console.log("everything is okay at delete the event");
       // const event = await Event.findByIdAndDelete({ eventId });
 
+      const event = await Event.findByIdAndDelete(eventId);
 
-      // res.json({
-      //   success: true,
-      //   message: "Deleted Event successfully",
-      // });
+      res.json({
+        success: true,
+        message: "Deleted Event successfully",
+      });
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }
   })
 );
+
+
+//get all events of all shops 
+
+
+router.get(
+  "/get-all-events-shop",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      // const shopeId = req.params.id;
+      // // console.log(shopId);
+      const events = await Event.find();
+      // console.log(events);
+      res.json({
+        success: true,
+        events,
+      });
+    } catch (error) {
+      console.log(error);
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
 module.exports = router;

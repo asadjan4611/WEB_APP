@@ -2,7 +2,10 @@ import React from 'react'
 import DashoardHeader from '../ShopComponents/layout/DashoardHeader'
 import DashboarSideBar from '../ShopComponents/layout/DashboarSideBar'
 import AllEvents from "../ShopComponents/AllEvents"
+import { useSelector } from 'react-redux'
 const ShopAllEvents = () => {
+  // const {allevents}= useSelector((state)=>state.events);
+  // console.log("all eveny",allevents)
   return (
      <div>
           <DashoardHeader/>

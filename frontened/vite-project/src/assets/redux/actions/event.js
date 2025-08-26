@@ -70,3 +70,28 @@ export const deleteEvent=(id) =>async(dispatch)=>{
     })
   }
 }
+
+
+
+// get all events of all shops
+
+export const getAllShopsEvennts = (id)=>async(dispatch)=>{
+  try {
+     dispatch({
+       type: "getAllShopEventRequest"
+  });
+
+  const {data} = await axios.get(`http://localhost:8000/api/event/get-all-events-shop`);
+  //  console.log(data);
+  dispatch({
+    type:"getAllShopEventsSuccess",
+    payload:data.events
+  });
+  } catch (error) {
+    dispatch({
+            type:"getAllShopEventsFailure",
+            payload:error.response.data,
+        })
+  console.log(error);
+  }
+}

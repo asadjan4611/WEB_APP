@@ -1,7 +1,8 @@
 import React from "react";
 import styles from "../../../style/style";
 import  CountDown from "../CountDown/CountDown"
-const Card = ({active}) => {
+const Card = ({active,data}) => {
+  // console.log(data)
   return (
     <>
       <div className={`w-full p-2 bg-white ${active? "unset":"mb-12"} block lg:flex`}>

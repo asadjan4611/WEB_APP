@@ -13,7 +13,7 @@ import NavBar from "./NavBar";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styles from "../../style/style";
-import { backned_Url } from "../../server.js";
+import { backned_Url } from "../../serverRoute.js";
 import Cart from "../Cart/Cart";
 import WishList from "../WishList/WishList";
 const Header = ({ activeHeading }) => {
@@ -146,7 +146,10 @@ const Header = ({ activeHeading }) => {
           <div className="flex">
             {/* favourite order products */}
 
-            <div onClick={()=>setOpenWishList(true)} className={`${styles.noramlFlex}`}>
+            <div
+              onClick={() => setOpenWishList(true)}
+              className={`${styles.noramlFlex}`}
+            >
               <div className="relative w-fit cursor-pointer mr-[15px]">
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                 <span className="absolute m-0 p-0  top-0 right-0 bg-green-400   text-white font-mono leading-tight text-center text-[15px]  rounded-full w-4 h-4 flex items-center justify-center">
@@ -156,7 +159,10 @@ const Header = ({ activeHeading }) => {
             </div>
 
             {/* shopping cart products */}
-            <div onClick={()=>setOpenCart(true)} className={`${styles.noramlFlex}`}>
+            <div
+              onClick={() => setOpenCart(true)}
+              className={`${styles.noramlFlex}`}
+            >
               <div className="relative w-fit cursor-pointer mr-[15px]">
                 <AiOutlineShoppingCart
                   size={30}
@@ -189,18 +195,14 @@ const Header = ({ activeHeading }) => {
             </div>
 
             {/* cart open */}
-            {openCart ? <Cart setOpenCart={setOpenCart} /> : null
-            }
-
+            {openCart ? <Cart setOpenCart={setOpenCart} /> : null}
 
             {/* wishList  open cart */}
-            
-            
-            {/* cart open */}
-            {
-            openWishList ? <WishList setOpenWishList={setOpenWishList} /> : null
-            }
 
+            {/* cart open */}
+            {openWishList ? (
+              <WishList setOpenWishList={setOpenWishList} />
+            ) : null}
           </div>
         </div>
       </div>

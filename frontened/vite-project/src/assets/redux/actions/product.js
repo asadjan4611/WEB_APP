@@ -23,14 +23,14 @@ export const createProduct =(newForm)=>async(dispatch)=>{
         console.log(error);
         dispatch({
             type:"productCreateFailure",
-            payload:error.response.data
+            payload:error.message
         })
      }
 }
 
 
 
-//get all products
+//get all products of a shop of a specific uset
 
 export const getAllProduct = (id)=>async(dispatch)=>{
   try {
@@ -46,8 +46,8 @@ export const getAllProduct = (id)=>async(dispatch)=>{
   });
   } catch (error) {
     dispatch({
-            type:"productCreateFailure",
-            payload:error.response.data,
+            type:"getAllProductsFailure",
+            payload:error.response.data.message
         })
   console.log(error);
   }
@@ -72,7 +72,31 @@ export const deleteProduct=(id) =>async(dispatch)=>{
     console.log(error);
     dispatch({
       type:"deleteProductFailure",
-      payload:error.response.data
+      payload:error.response.data?.message
     })
+  }
+}
+
+
+// get all products of all shops
+
+
+export const getAllProductss = ()=>async(dispatch)=>{
+  try {
+     dispatch({
+       type: "getAllProductssRequest"
+  });
+
+  const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products`);
+  dispatch({
+    type:"getAllProductssSuccess",
+    payload:data.products
+  });
+  } catch (error) {
+    dispatch({
+            type:"productssCreateFailure",
+            payload:error.response.data.message
+        })
+  console.log(error);
   }
 }

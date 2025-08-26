@@ -31,14 +31,18 @@ import {
   ShopCreateProduct,
   ShopAllProducts,
   ShopCreateEvent,
-  ShopAllEvents
+  ShopAllEvents,
+  CouponCode
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
 import { loadSeller, loadUser } from "./assets/redux/actions/user";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
+import Store from "./assets/redux/store.js";
 import ShopProtectedRoute from "./ShopProtectedRoute/ShopProtectedRoute.jsx";
+import { getAllShopsEvennts } from "./assets/redux/actions/event.js";
+import { getAllProductss } from "./assets/redux/actions/product.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -52,12 +56,13 @@ function App() {
     // Get tokens from cookies
     const token = Cookies.get("token");
     const sellerToken = Cookies.get("seller_token");
+     Store.dispatch(getAllShopsEvennts());
+     Store.dispatch(getAllProductss());
 
     if (token && !sellerToken) {
-      // dispatch(setUser(null)); // Triggers user loading
       loadUser(dispatch);
     } else if (sellerToken) {
-      // dispatch(setSeller(null)); // Triggers seller loading
+
       loadSeller(dispatch);
     }
   }, [location.pathname, dispatch]);
@@ -153,6 +158,14 @@ function App() {
           element={
             <ShopProtectedRoute>
               <ShopAllEvents />
+            </ShopProtectedRoute>
+          }
+        />
+         <Route
+          path="/dashboard-coupans"
+          element={
+            <ShopProtectedRoute>
+              <CouponCode />
             </ShopProtectedRoute>
           }
         />

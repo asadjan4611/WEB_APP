@@ -156,7 +156,7 @@ const DashboarSideBar = ({ active }) => {
 
 
        <div className="w-full flex items-center">
-        <Link to={"/dashboard/coupans"} className="w-full flex items-center"> 
+        <Link to={"/dashboard-coupans"} className="w-full flex items-center"> 
           <AiOutlineGift
           className="my-3"
             size={30}

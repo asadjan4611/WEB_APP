@@ -5,12 +5,15 @@ const initialState={
     error:null,
     product:null,
     products:[],
+    allproducts:[],
     success :false,
     message:null
 }
 
 export const productReducer = createReducer(initialState,(builder)=>{
     builder
+
+    // create product of a shop
     .addCase(
    "productCreateRequest",(state)=>{
     state.isLoading=true;
@@ -24,7 +27,9 @@ export const productReducer = createReducer(initialState,(builder)=>{
       state.isLoading=false;
     state.error=action.payload;
     state.success=false
-   }).addCase(
+   })
+   //get all products of a specif shop
+   .addCase(
     "getAllProductsRequest",(state,action)=>{
       state.isLoading=true;
     }
@@ -37,6 +42,8 @@ export const productReducer = createReducer(initialState,(builder)=>{
     state.isLoading=false;
     state.error=action.payload;
    }).
+
+   //delete a products
    addCase("deleteProductRequest",(state)=>{
         state.isLoading= false;
    }).
@@ -48,7 +55,31 @@ export const productReducer = createReducer(initialState,(builder)=>{
         state.isLoading= false;
         state.error=action.payload
    })
+
+
+   //get all the products of all shops
+
+    .addCase(
+    "getAllProductssRequest",(state,action)=>{
+      state.isLoading=true;
+    }
+   )
+   .addCase("getAllProductssSuccess",(state,action)=>{
+    state.isLoading=false;
+    state.allproducts = action.payload;
+   }).
+   addCase("productssCreateFailure",(state,action)=>{
+    state.isLoading=false;
+    state.error=action.payload;
+   })
+
+   
+ // clear the error
+
    .addCase( "clearError",(state)=>{
     state.error=null;
    })
 })
+
+
+

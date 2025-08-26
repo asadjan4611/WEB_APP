@@ -1,7 +1,9 @@
 import React from 'react'
 import styles from '../../../style/style'
 import Cards from "../Card/Card.jsx";
+import { useSelector } from 'react-redux';
 const EventCard = () => {
+    const {allproducts}=useSelector((state)=>state.products);
   return (
     <div>
       <div className={`${styles.section} mt-5`}>

@@ -6,6 +6,7 @@ const Shop = require("../model/shop");
 const { upload } = require("../multer");
 const ErrorHandler = require("../utils/ErrorHandler");
 const fs = require("fs");
+const  path = require("path");
 //create  a product
 router.post(
   "/create-product",
@@ -70,16 +71,22 @@ router.post(
    try {
         console.log("welocome at function of deleting the product");
         const productId = req.params.id;
+        console.log(productId)
         const productData = await Product.findById(productId);
-        // console.log(product.images);
+        console.log(productData);
   
         productData.images.forEach((imageUrl) => {
-          const filename = imageUrl;
-          const filepath=`../uploads/${filename}`
-          // console.log(filepath);
+         
+          const filepath=path.join( process.cwd(),"uploads",imageUrl);
+          console.log(filepath);
           fs.unlink(filepath,(err)=>{
-            console.log(err)
-          });
+          if (err) {
+              console.log(err)
+          } else {
+             console.log("Product deleted sucessfully",filepath) 
+          }
+          }
+        );
           
         });
         console.log("everything is okay")
@@ -87,19 +94,32 @@ router.post(
         if (!productData) {
           return next( new ErrorHandler("product is not exist",400));  
         }
-        // const product = await Product.findByIdAndDelete(productId);
-        // res.status(200).json({
-        //     success :true,
-        //     "message":"Delete the product sucessfully"
-        //  });
+        const product = await Product.findByIdAndDelete(productId);
+        res.status(200).json({
+            success :true,
+            "message":"Delete the product sucessfully"
+         });
         } catch (error) {
           return next( new ErrorHandler(error,400));  
     }
   }));
 
 
+//get all products of all shops
+  router.get("/get-all-products",AsyncCatchError(async(req,res,next)=>{
+     try {
+      //  const shopeId = req.params.id;
+       const products=  await Product.find();
+       
+       res.json({
+        success :true,
+        products
+       });
 
-
+     } catch (error) {
+        return next(new ErrorHandler(error,400))
+     }
+ }));
 
   
   module.exports = router;

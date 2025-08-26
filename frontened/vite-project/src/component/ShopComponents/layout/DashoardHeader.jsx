@@ -5,9 +5,9 @@ import { useSelector } from "react-redux";
 import { FiPackage, FiShoppingBag } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
-import { backned_Url } from "../../../server";
+import { backned_Url } from "../../../serverRoute";
 const DashoardHeader = () => {
-  const { seller,isSeller } = useSelector((state) => state.seller);
+  const { seller, isSeller } = useSelector((state) => state.seller);
   // console.log(seller);
   return (
     <div className="w-full h-[80px] shadow sticky top-0 left-0 flex items-center justify-between px-4">
@@ -24,7 +24,7 @@ const DashoardHeader = () => {
           className="flex
              items-center mr-4"
         >
-          <Link className="md:block hidden" to={"/dashboard/coupans"}>
+          <Link className="md:block hidden" to={"/dashboard-coupans"}>
             <AiOutlineGift
               color="#555"
               className="mx-5 cursor-pointer"
@@ -59,20 +59,15 @@ const DashoardHeader = () => {
             />
           </Link>
 
-
-
-         {
-          isSeller && (
-                    <Link to={`/seller/${seller._id}`}>
-            <img
-              className="h-[35px] w-[35px] rounded-full"
-              src={`${backned_Url}/uploads/${seller.avatar.url}`}
-              alt="asad jan"
-            />
-          </Link>
-          )
-         }
-        
+          {isSeller && (
+            <Link to={`/seller/${seller._id}`}>
+              <img
+                className="h-[35px] w-[35px] rounded-full"
+                src={`${backned_Url}/uploads/${seller.avatar.url}`}
+                alt="asad jan"
+              />
+            </Link>
+          )}
         </div>
       </div>
     </div>
