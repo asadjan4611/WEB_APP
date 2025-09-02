@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../../style/style";
 import { AiFillHeart, AiOutlineHeart, AiOutlineMessage, AiOutlineShoppingCart } from "react-icons/ai";
+import { backned_Url } from "../../../serverRoute";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { addToCart } from "../../../assets/redux/actions/cart";
 const ProductCardDetails = ({ setOpen, data }) => {
-  console.log(data);
+  const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
+  const {cart}= useSelector((state)=>state.cart);
   const [select, setSelect] = useState(false);
-
+  // console.log(data.stock)
   const handleSubmittMessage = () => {};
   const DecrementCount = () => {
     if (count > 1) {
@@ -18,6 +24,22 @@ const ProductCardDetails = ({ setOpen, data }) => {
   const increamentCount = () => {
     setCount(count + 1);
   };
+
+  const addToCartHandler=(id)=>{
+   const isItemExist = cart && cart.find((i)=>i._id === id);
+   if (isItemExist) {
+    toast.error("Item is already exist in Cart!");
+   }else{
+   if (count> data.stock) {
+    toast.error("Product Limit is outreached!!!")
+   }else{
+     const cartData= {...data,qty:count}
+    dispatch(addToCart(cartData))
+    // console.log(cartData)
+    toast.success("Item is added in Cart .. ")
+   }
+   }
+  }
   return (
     <div className="bg-white">
       {data ? (
@@ -29,21 +51,23 @@ const ProductCardDetails = ({ setOpen, data }) => {
               onClick={() => setOpen(false)}
             />
 
-            <div className="w-full flex">
+            <div className="w-full flex ">
               {/* Left side  */}
               <div className=" block w-[50%] 800px:w-[50%]">
                 <img
     
-                  src={data.image_Url[0].url}
-                  className="object-contain h-[70vh]"
+                  src={`${backned_Url}/uploads/${data.images[0]}`}
+                  className="object-contain h-[70vh] px-2"
                   alt=""
                 />
+                  <Link to={`/shop/preview/${data.shopeId}`}>
                 <div className="flex">
                   <img
-                    src={data.shop.shop_avatar.url}
-                    className="w-[50px h-[50px] mt-4 rounded-full mr-2]"
+                    src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
+                    className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
                     alt=""
                   />
+                 
                   <div>
                     <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
                       {data.shop.name}
@@ -53,7 +77,9 @@ const ProductCardDetails = ({ setOpen, data }) => {
                       {data.shop.ratings} Rating
                     </h3>
                   </div>
+
                 </div>
+                 </Link>
                 <div
                   onClick={handleSubmittMessage}
                   className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
@@ -63,7 +89,7 @@ const ProductCardDetails = ({ setOpen, data }) => {
                   </span>
                 </div>
                 <h4 className="text-[15px] text-red-500 font-semibold ml-3 mt-5">
-                  {data.total_sell} Sold out
+                  {data.sold_out} Sold out
                 </h4>
               </div>
 
@@ -78,10 +104,10 @@ const ProductCardDetails = ({ setOpen, data }) => {
 
                 <div className=" flex pt-3">
                   <h6 className={`${styles.productDiscountPrice}`}>
-                    {data.discount_price} $
+                    {data.discountPrice} $
                   </h6>
                   <h4 className={`${styles.price}`}>
-                    {data.price ? data.price + "$" : null}
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h4>
                 </div>
                 <div className="flex justify-between pr-3 mt-12 items-center">
@@ -124,7 +150,7 @@ const ProductCardDetails = ({ setOpen, data }) => {
                   </div>
                 </div>
                     <div
-                  onClick={handleSubmittMessage}
+                  onClick={()=>addToCartHandler(data._id)}
                   className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
                 >
                   <span className="text-white flex items-center">

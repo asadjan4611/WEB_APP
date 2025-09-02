@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "../../style/style";
 import {
   AiFillHeart,
@@ -7,15 +7,24 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import { backned_Url } from "../../serverRoute";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProduct } from "../../assets/redux/actions/product";
 
 const ProductDetail = ({ data }) => {
+  // console.log(data.shopeId);
+  const dispatch = useDispatch();
+  const { products } = useSelector((state) => state.products);
   const [click, setClick] = useState(false);
-  const [select, setSelect] = useState(1);
+  const [select, setSelect] = useState(0);
   const [count, setCount] = useState(0);
-  //    console.log( data);
   const navigate = useNavigate();
-
   const handleSubmitMessage = () => {};
+  useEffect(() => {
+    dispatch(getAllProduct(data.shopeId));
+  }, []);
 
   const DecrementCount = () => {
     if (count > 1) {
@@ -36,24 +45,26 @@ const ProductDetail = ({ data }) => {
             <div className="w-full 800px:w-[50%]">
               {/* Main Image */}
               <img
-                src={data.image_Url[select].url}
+                src={`${backned_Url}/uploads/${data.images[select]}`}
                 alt=""
                 className="w-full h-[400px] object-contain rounded shadow-md"
               />
 
               {/* Thumbnails */}
               <div className="w-full px-5 flex flex-wrap mt-4 gap-4">
-                {data.image_Url.map((img, index) => (
+                {data.images.map((img, index) => (
                   <div
                     key={index}
                     className={`cursor-pointer p-1 ${
                       select === index ? "border-2 border-blue-500 rounded" : ""
                     }`}
                   >
+                    {/* console.log(img) */}
                     <img
                       className="h-[100px] w-[100px] object-cover rounded"
                       onClick={() => setSelect(index)}
-                      src={img.url}
+                      src={`${backned_Url}/uploads/${data.images[index]}`}
+                      // src={img.url}
                       alt=""
                     />
                   </div>
@@ -73,11 +84,11 @@ const ProductDetail = ({ data }) => {
 
               <div className="flex pt-3">
                 <h2 className={`${styles.productDiscountPrice}`}>
-                  ${data.discount_price}
+                  ${data.discountPrice}
                 </h2>
 
                 <h3 className={`${styles.price}`}>
-                  {data.price ? data.price + "$" : ""}
+                  {data.originalPrice ? data.originalPrice + "$" : ""}
                 </h3>
               </div>
 
@@ -134,19 +145,23 @@ const ProductDetail = ({ data }) => {
               <div className="flex mt-8 justify-items-start items-start">
                 <div className="flex">
                   <img
-                    src={data.shop.shop_avatar.url}
-                    className="w-[50px h-[50px] mt-4 rounded-full mr-2]"
-                    alt=""
+                    src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
+                    className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
+                    alt="asad jan"
                   />
-                  <div>
-                    <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
-                      {data.shop.name}
-                    </h3>
+                  <Link to={`/shop/preview/${data.shopeId}`}>
+                    <div>
+                      <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
+                        {data.shop.name}
+                      </h3>
 
-                    <h4 className={`${styles.shop_name} ml-3 top-0 bottom-0 `}>
-                      {data.shop.ratings} Rating
-                    </h4>
-                  </div>
+                      <h4
+                        className={`${styles.shop_name} ml-3 top-0 bottom-0 `}
+                      >
+                        {data.shop.ratings} Rating
+                      </h4>
+                    </div>
+                  </Link>
                 </div>
 
                 <div
@@ -162,7 +177,7 @@ const ProductDetail = ({ data }) => {
             </div>
           </div>
 
-          <ProductDetailsInfo data={data} />
+          <ProductDetailsInfo data={data} products={products} />
           <br />
           <br />
         </div>
@@ -171,7 +186,7 @@ const ProductDetail = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data }) => {
+const ProductDetailsInfo = ({ data, products }) => {
   const [active, setActive] = useState(1);
 
   return (
@@ -220,24 +235,7 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 1 ? (
         <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla
-            beatae hic ut, voluptas, exercitationem, sed voluptate animi
-            molestias odit iusto magnam voluptatum repellendus porro earum magni
-            similique nam? Tempore, a.
-          </p>
-
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla
-            beatae hic ut, voluptas, exercitationem, sed voluptate animi
-            molestias odit iusto magnam voluptatum repellendus porro earum magni
-            similique nam? Tempore, a.
-          </p>
-
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla
-            beatae hic ut, voluptas, exercitationem, sed voluptate animi
-            molestias odit iusto magnam voluptatum repellendus porro earum magni
-            similique nam? Tempore, a.
+            {data.description}
           </p>
         </>
       ) : null}
@@ -249,58 +247,64 @@ const ProductDetailsInfo = ({ data }) => {
       ) : null}
 
       {active === 3 ? (
-       <div className="w-full flex flex-row 800px:flex-row justify-between p-5">
-  {/* Left Side */}
-  <div  className="w-full 800px:w-[50%] mb-4 800px:mb-0">
-    <div className="flex items-center">
-      <img
-        src={data.shop.shop_avatar.url}
-        className="h-[50px] w-[50px] rounded-full"
-        alt="Shop"
-      />
-      <div className="ml-3">
-        <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-        <h4 className={`${styles.shop_name}`}>{data.shop.ratings} Rating</h4>
-      </div>
-    </div>
-    <p className="pt-2">
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusantium
-      porro mollitia sequi? Perferendis velit quasi debitis tempora ipsa
-      asperiores esse sint earum quo omnis iure illo, voluptate sunt commodi
-      beatae in. Ab?
-    </p>
-  </div>
+        <div className="w-full flex flex-row 800px:flex-row justify-between p-5">
+          {/* Left Side */}
+          <div className="w-full 800px:w-[50%] mb-4 800px:mb-0">
+            <Link to={`/shop/preview/${data.shopeId}`}>
+              <div className="flex items-center">
+                <img
+                  src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
+                  className="h-[50px] w-[50px] rounded-full object-cover"
+                  alt="Shop"
+                />
+                <div className="ml-3">
+                  <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                  <h4 className={`${styles.shop_name}`}>
+                    {data.shop.ratings} Rating
+                  </h4>
+                </div>
+              </div>
+            </Link>
+            <p className="pt-2">{data.shop.desciption}</p>
+          </div>
 
-  {/* Right Side */}
-  <div className="w-full 800px:w-[45%] px-6 p-4 rounded 800px:px-0">
-     <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex items-end flex-col">
-        <div className="text-right">
-            <h5 className="font-[600]">
-                Joined on:<span className="font-[500]"> 14March 2023</span>
-            </h5>
-        </div>
+          {/* Right Side */}
+          <div className="w-full 800px:w-[45%] px-6 p-4 rounded 800px:px-0">
+            <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex items-end flex-col">
+              <div className="text-right">
+                <h5 className="font-[600]">
+                  Joined on:
+                  <span className="font-[500]">
+                    {data.createdAt.slice(0, 10)}
+                  </span>
+                </h5>
+              </div>
 
-        <div className="text-right">
-            <h5 className="font-[600]">
-                Total Products:<span className="font-[500]"> 2023</span>
-            </h5>
-        </div>
-        <div className="text-right">
-            <h5 className="font-[600]">
-                 Toatal Reviews :<span className="font-[500]">2023</span>
-            </h5>
-        </div>
+              <div className="text-right">
+                <h5 className="font-[600]">
+                  Total Products:
+                  <span className="font-[500]">
+                    {" "}
+                    {products && products.length}
+                  </span>
+                </h5>
+              </div>
+              <div className="text-right">
+                <h5 className="font-[600]">
+                  Toatal Reviews :<span className="font-[500]">2023</span>
+                </h5>
+              </div>
 
-        <Link to={"/"}>
-
-        <div className={`${styles.button} mt-12 ml-80 rounded-md cursor-pointer`}>
-        <h3 className="text-white">Visit Shop</h3>
+              <Link to={"/"}>
+                <div
+                  className={`${styles.button} mt-12 ml-80 rounded-md cursor-pointer`}
+                >
+                  <h3 className="text-white">Visit Shop</h3>
+                </div>
+              </Link>
+            </div>
+          </div>
         </div>
-        </Link>
-     </div>
-  </div>
-</div>
- 
       ) : null}
     </div>
   );

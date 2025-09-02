@@ -19,10 +19,11 @@ const ShopProtectedRoute =({children})=>{
   if (isLoading === true) {
     return <Loader/>
   }else{
-    if (!isSeller) {
-       return <Navigate to={'/shop-login'} replace/>
-    }
-    return children;
+    if (isSeller) {
+          return children;
+        }
+        return <Navigate to={'/shop-login'} replace/>
+
   }
   }
 

@@ -14,6 +14,7 @@ const AllProducts = () => {
 
   const dispatch = useDispatch();
   useEffect(()=>{
+    // console.log(seller._id);
    dispatch(getAllProduct(seller._id))
   },[dispatch]);
 

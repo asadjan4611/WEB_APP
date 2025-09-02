@@ -11,6 +11,7 @@ const sendMail = require("../utils/sendMail");
 const { sendShopToken } = require("../utils/sendShopToken.js");
 const { isAuthorized, isSeller } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
+const catchAsyncError = require("../middleware/catchAsyncError");
 
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
   try {
@@ -151,7 +152,7 @@ router.post(
   })
 );
 
-//get all products of the user
+//get user
 router.get(
   "/getSeller",
   isSeller,
@@ -184,17 +185,35 @@ router.get(
   AsyncCatchError(async (req, res, next) => {
     try {
       console.log("Welocme at logout function");
-    res.cookie("seller_token", "", {
-      expiresIn: new Date(Date.now),
-      httpOnly: true,
-    });
-    res.status(200).json({
-      message:"Logout sucessfully"
-    });
+      res.cookie("seller_token", "", {
+        expiresIn: new Date(Date.now),
+        httpOnly: true,
+      });
+      res.status(200).json({
+        message: "Logout sucessfully",
+      });
     } catch (error) {
-      return next(new ErrorHandler(error,400 ));
+      return next(new ErrorHandler(error, 400));
     }
-    
+  })
+);
+
+//get shopInfo
+router.get(
+  "/get-shop-info/:id",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const shopId = req.params.id;
+      // console.log(shopId)
+      const sellerInfo = await Shop.findById(shopId);
+        // console.log(sellerInfo)
+      res.status(200).json({
+        success: true,
+        sellerInfo,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
   })
 );
 

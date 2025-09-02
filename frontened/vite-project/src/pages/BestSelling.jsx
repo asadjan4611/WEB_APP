@@ -3,12 +3,16 @@ import Header from '../component/layout/Header'
 import { productData } from '../static/data';
 import ProductCard from '../component/Route/ProductCard/ProductCard';
 import styles from '../style/style';
+import { useSelector } from 'react-redux';
 
 const BestSelling = () => {
+  const {allproducts} = useSelector((state)=>state.products);
     const [data,setData] = useState([]);
     useEffect(()=>{
-      const d = productData && productData.sort((a,b)=>a.total_sell-b.total_sell);
-      console.log(d);
+      // const d = productData && productData.sort((a,b)=>a.total_sell-b.total_sell);
+      const d = allproducts && [...allproducts].sort((a,b)=>a.sold_out-b.sold_out);
+
+      // console.log(d);
       setData(d)
     },[]);
   return (

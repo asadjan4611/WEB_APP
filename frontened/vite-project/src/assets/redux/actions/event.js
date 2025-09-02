@@ -28,6 +28,7 @@ export const createEvent =(newForm)=>async(dispatch)=>{
 //getALlEvents
 export const getAllEvennts = (id)=>async(dispatch)=>{
   try {
+    // console.log(id.id);
      dispatch({
        type: "getAllEventRequest"
   });

@@ -30,16 +30,17 @@ export const createProduct =(newForm)=>async(dispatch)=>{
 
 
 
-//get all products of a shop of a specific uset
+//get all products  of a specific shop
 
 export const getAllProduct = (id)=>async(dispatch)=>{
+  // console.log(id)
   try {
      dispatch({
        type: "getAllProductsRequest"
   });
 
   const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products-shop/${id}`);
-
+  //  console.log(data)
   dispatch({
     type:"getAllProductsSuccess",
     payload:data.products

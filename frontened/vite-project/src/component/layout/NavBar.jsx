@@ -4,12 +4,13 @@ import { naviItems } from '../../static/data'
 import { Link } from 'react-router-dom'
 
 const NavBar = ({active}) => {
+  // console.log(active)
   return (
   <div className={`${styles.noramlFlex}`}>
       {
         naviItems && naviItems.map((i,index)=>(
           <div key={index} className='flex'>
-            <Link to={i.url} className={`${active === index+1} ? "text-[#17dd1f] : "text-green font-[600] px-6 cursor-pointer"` } >
+            <Link to={i.url} className={`${active === index+1 ? 'text-green-600 px-6 font-bold' : 'text-white font-[600] px-6 cursor-pointer'}`  } >
             {i.title}
             </Link>
           </div>

@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux';
       <Hero/>
       <Categories/>
       <BestDeals/>
-      <EventCard/>
+      {/* <EventCard/> */}
       <FeacturedProducts/>
       <Sponsered/>
       <Footer/>

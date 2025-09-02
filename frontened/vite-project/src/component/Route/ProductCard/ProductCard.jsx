@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import styles from "../../../style/style";
 import ProductCardDetails   from "../productCardDetails/ProductCardDetails";
 import {AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart, AiOutlineShoppingCart, AiOutlineStar} from 'react-icons/ai'
+import { backned_Url } from "../../../serverRoute";
 const ProductCard = ({ data }) => {
+  // console.log(data)
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
   const d = data.name;
   const product_name = d.replace(/\s+/g, "-");
-  // console.log("products-name is ",product_name);
 
   return (
     <>
@@ -16,9 +17,9 @@ const ProductCard = ({ data }) => {
         <div className="flex justify-end">
         <Link to={`/product/${product_name}`}>
           <img
-            src={data.image_Url[0].url}
+            src={`${backned_Url}/uploads/${data.images[0]}`} // changing for  best deals of homepage
             className="object-contain w-full h-[170px]"
-            alt="A man outside the shop"
+            alt="loading error"
 />
         </Link>
 
@@ -87,16 +88,16 @@ const ProductCard = ({ data }) => {
                <div className="flex">
                   <h5 className={`${styles.productDiscountPrice}`}>
                     {
-                      data.price === 0 ? data.price :data.discount_price
+                      data.originalPrice === 0 ? data.originalPrice :data.discountPrice
                     }$
                   </h5>
                   <h4 className={`${styles.price}`}>
                    {
-                    data.price? data.price+"$":null
+                    data.originalPrice? data.originalPrice+"$":null
                    }
                   </h4>
                </div>
-               <span className={`${styles.shop_name} text-[17px]`}>{data.total_sell} sold</span>
+               <span className={`${styles.shop_name} text-[17px]`}>{data.sold_out} sold</span>
             </div>
 
        

@@ -11,20 +11,19 @@ const ProductsPage = () => {
   const [searchParams] = useSearchParams();
   const categoriesData = searchParams.get("category");
   const [data, setData] = useState([]);
-  console.log(allproducts);
-  // console.log(data);
+  // console.log(allproducts);
+  console.log("categoriesData ", categoriesData);
   useEffect(() => {
     if (categoriesData === null) {
       const d =
-        productData && productData.sort((a, b) => b.total_sell - a.total_sell);
-        // allproducts && allproducts.sort((a, b) => b.sold_out - a.sold_out);
+        // productData && productData.sort((a, b) => b.total_sell - a.total_sell);
+        allproducts && [...allproducts].sort((a, b) => b.sold_out - a.sold_out);
       // console.log(d);
       setData(d);
     } else {
       const d =
-        productData && productData.filter((i) => i.category === categoriesData);
-        // allproducts && allproducts.filter((i) => i.category === categoriesData);
-      // console.log(d);
+        allproducts && allproducts.filter((i) => i.category === categoriesData);
+      console.log("d is ",d);
       setData(d);
     }
     // window.scrollTo(0,0);

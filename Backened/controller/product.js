@@ -51,9 +51,11 @@ router.post(
 //get all products
  router.get("/get-all-products-shop/:id",AsyncCatchError(async(req,res,next)=>{
      try {
+      // console.log("hi")
        const shopeId = req.params.id;
-       const products=  await Product.find({shopeId});
-       
+      //  console.log(shopeId)
+      const products = await Product.find({ shopeId: shopeId });
+      //  console.log(products)
        res.json({
         success :true,
         products
