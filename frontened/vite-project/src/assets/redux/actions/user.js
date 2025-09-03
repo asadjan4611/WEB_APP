@@ -1,17 +1,14 @@
 import axios from "axios";
+import { backned_Url } from "../../../serverRoute";
 
-export const loadUser = async (dispatch) => {
-  // console.log("Welcome at load user function")
+export const loadUser = () => async (dispatch) => {
   try {
-    dispatch({
-      type: "loadUserRequest",
-    });
-    // console.log("Welcome at load user function before api")
+    dispatch({ type: "loadUserRequest" });
 
-    const res = await axios.get(`http://localhost:8000/api/user/getUser`, {
+    const res = await axios.get("http://localhost:8000/api/user/getUser", {
       withCredentials: true,
     });
-    // console.log("res is ",res.data.user)
+    // console.log(res)
     dispatch({
       type: "loadUserSucessfully",
       payload: res.data.user,
@@ -19,11 +16,10 @@ export const loadUser = async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "loadUserFailure",
-      payload: error.data?.response.message,
+      payload: error.response?.data?.message || error.message,
     });
   }
 };
-
 
 export const loadSeller = async (dispatch) => {
   // console.log("Welcome at load user function")
@@ -48,3 +44,31 @@ export const loadSeller = async (dispatch) => {
     });
   }
 };
+
+export const updateUserInfo =(email,name, password, phoneNumber) => async (dispatch) => {
+  // console.log("welocome at dispatch")
+    try {
+      dispatch({
+        type: "updateUserInfoRequest",
+      });
+  //  console.log(email,password,name,phoneNumber)
+      const { data } = await axios.put(`${backned_Url}/api/user/updateUserInfo`,{
+        name,
+        email,
+        password,
+        phoneNumber
+      },{
+        withCredentials:true
+      });
+
+      dispatch({
+        types: "updateUserInfoSuccess",
+        payload: data.user,
+      });
+    } catch (error) {
+      dispatch({
+        type: "updateUserInfoFailure",
+        payload: error.response?.data?.message,
+      });
+    }
+  };

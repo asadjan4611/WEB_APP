@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineArrowRight, AiOutlineCamera, AiOutlineDelete } from "react-icons/ai";
 import styles from "../../style/style";
 import { Button } from "@mui/material";
@@ -7,17 +7,27 @@ import { DataGrid } from "@mui/x-data-grid";
 import { MdOutlineAudiotrack, MdOutlineTrackChanges } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { backned_Url } from "../../serverRoute";
+import { updateUserInfo } from "../../assets/redux/actions/user";
+import {toast}  from "react-toastify"
 const ProfileContent = ({ active }) => {
-  const { user } = useSelector((state) => state.user);
+  const dispatch= useDispatch();
+  const { user,error} = useSelector((state) => state.user);
   const [name, setName] = useState(user && user.name);
+
   const [email, setEmail] = useState(user && user.email);
-  const [number, setNumber] = useState();
-  const [zipCode, setZipCode] = useState();
-  const [address1, setAddress1] = useState("");
-  const [address2, setAddress2] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState( user && user.phoneNumber );
+  const [password,setPassword]= useState("");
+
+ useEffect(()=>{
+  if(error){
+    toast.error(error)
+  }
+ },[]);
 
   const handleSubmitt = (e) => {
     e.preventDefault();
+    dispatch(updateUserInfo(email,name,password,phoneNumber));
+    toast.success("Update information sucessfully");
   };
 
   // console.log(user)
@@ -69,44 +79,26 @@ const ProfileContent = ({ active }) => {
                   <label className="block pb-2">Contact Number</label>
                   <input
                     required
-                    value={number || " "}
-                    onChange={(e) => setNumber(e.target.value)}
+                    value={phoneNumber || " "}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     type="text"
                     className={`${styles.input}`}
                   />
                 </div>
 
                 <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Zip Code</label>
+                  <label className="block pb-2">Enter your password</label>
                   <input
                     required
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    type="text"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    type="password"
                     className={`${styles.input}`}
                   />
                 </div>
 
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Address 1</label>
-                  <input
-                    required
-                    value={address1}
-                    onChange={(e) => setAddress1(e.target.value)}
-                    type="text"
-                    className={`${styles.input}`}
-                  />
-                </div>
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Address 2</label>
-                  <input
-                    required
-                    value={address2}
-                    onChange={(e) => setAddress2(e.target.value)}
-                    type="text"
-                    className={`${styles.input}`}
-                  />
-                </div>
+              
+                
                 <div className="">
                   <input
                     className=" mt-5 w-[250px] h-[40px] border text-center border-[#3a24db] text-[#3a24db] rounded-[3px] cursor-pointer hover:opacity-45 "

@@ -8,12 +8,14 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { createEvent } from "../../assets/redux/actions/event";
 const CreateEvent = () => {
+
   const { seller } = useSelector((state) => state.seller);
   const { success, error } = useSelector((state) => state.events);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+
   const [images, setImages] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -22,7 +24,6 @@ const CreateEvent = () => {
   const [originalPrice, setOriginalPrice] = useState();
   const [discountPrice, setDiscountPrice] = useState();
   const [stock, setStock] = useState();
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 

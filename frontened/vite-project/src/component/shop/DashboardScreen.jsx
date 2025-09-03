@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardShopPage from "../../pages/shop/DashboardShopPage"
-const DashboardScreen = () => {
+const DashboardDashboardShopPageScreen = () => {
   return (
     <div>
      <DashboardShopPage/> 
@@ -8,4 +8,4 @@ const DashboardScreen = () => {
   )
 }
 
-export default DashboardScreen
+export default DashboardDashboardShopPageScreen

@@ -8,14 +8,13 @@ import { productData } from "../static/data.jsx";
 import { useSelector } from "react-redux";
 import Loader from "../component/layout/loader.jsx";
 const ProductDetailPage = () => {
-  const { name } = useParams();
+  const { id } = useParams();
   const [data, setData] = useState(null);
-  const productName = name.replace(/-/g, " ");
-
+  // console.log(name)
   const { allproducts } = useSelector((state) => state.products);
 
   useEffect(() => {
-    const dataa = allproducts.find((i) => i.name.toLowerCase().trim() === productName.toLowerCase().trim());
+    const dataa = allproducts.find((i) => i._id === id);
     // console.log("data is ", dataa);
     setData(dataa);
   }, [allproducts]);

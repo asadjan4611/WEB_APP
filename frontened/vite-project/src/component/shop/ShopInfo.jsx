@@ -9,7 +9,7 @@ import Loader from "../layout/loader";
 const ShopInfo = ({ isOwner }) => {
   const shopeId = useParams();
   const id = shopeId.id;
-  console.log(id)
+  // console.log(id)
   const [data, setData] = useState({});
   const [loading, isLoading] = useState(false);
   useEffect(() => {
@@ -39,6 +39,7 @@ const ShopInfo = ({ isOwner }) => {
   };
 
   // console.log(seller.avatar.url);
+  console.log(data)
   return (
     <>
  
@@ -46,8 +47,8 @@ const ShopInfo = ({ isOwner }) => {
       <div className="w-full py-5">
         <div className="w-full flex items-center justify-center">
           <img
-            src={`${backned_Url}/uploads/${data.avatar.url}`}
-            className="w-[150px] h-[150px] object-fit rounded-full"
+            src={`${backned_Url}/uploads/${data.avatar.public_id}`}
+            className="w-[150px] h-[150px] object-cover rounded-full"
             alt="asadjan"
           />
         </div>

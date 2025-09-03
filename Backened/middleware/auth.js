@@ -6,11 +6,11 @@ const User = require('../model/user');
 const Shop = require('../model/shop');
 
 exports.isAuthorized = (AsyncCatchError(async(req,res,next)=>{
-  console.log("Welcome at isautherized  function")
+//   console.log("Welcome at isautherized  function")
          
         const tokenObj = req.cookies;
          const token  = tokenObj.token
-        console.log("token is ",token);
+        // console.log("token is ",token);
         if (!token) {
             return next(new ErrorHandler("Please login first",401));
         }

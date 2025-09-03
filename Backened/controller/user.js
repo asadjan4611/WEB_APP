@@ -10,6 +10,7 @@ const AsyncCatchError = require("../middleware/catchAsyncError");
 const sendMail = require("../utils/sendMail");
 const { sendToken } = require("../utils/sendToken");
 const { isAuthorized } = require("../middleware/auth");
+const catchAsyncError = require("../middleware/catchAsyncError");
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -40,7 +41,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       name: name,
       email: email,
       password: password,
-       avatar: {
+      avatar: {
         url: fileUrl,
         public_id: filename,
       },
@@ -179,4 +180,60 @@ router.get(
     }
   })
 );
+
+//update user info
+
+router.put(
+  "/updateUserInfo",
+  isAuthorized,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const { email, password, phoneNumber, name } = req.body;
+      const user = await User.findOne({email}).select("+password");
+  
+      if (!user) {
+        return next(new ErrorHandler("user is not exist in database", 500));
+      }
+
+      const isPassowrdValid = await user.comparePassword(password);
+     
+      if (!isPassowrdValid) {
+        return next(new ErrorHandler("Password is not correct", 500));
+      }
+
+      user.name = name;
+      user.email = email;
+      user.phoneNumber = phoneNumber;
+
+      
+      await user.save();
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
+
+router.post("/update-user-avatar",upload.single("image"),AsyncCatchError(async(req,res,next)=>{
+  try {
+    const existUser = await User.findById(req.user.id);
+    const existAvatarPath = `uploads/${existUser.avatar}`;
+    fs.unlinkSync(existAvatarPath); 
+    const fileUrl = path.join(req.file.filename);
+    const user = await User.findByIdAndUpdate(req.user.id,{
+      avatar:fileUrl
+     });
+
+     res.status(200).json({
+      success:true,
+      user
+     });
+  } catch (error) {
+      return next(new ErrorHandler(error, 400)); 
+  }
+}))
 module.exports = router;

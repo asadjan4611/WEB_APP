@@ -12,13 +12,12 @@ const ProductsPage = () => {
   const categoriesData = searchParams.get("category");
   const [data, setData] = useState([]);
   // console.log(allproducts);
-  console.log("categoriesData ", categoriesData);
+  // console.log("categoriesData ", categoriesData);
   useEffect(() => {
     if (categoriesData === null) {
       const d =
-        // productData && productData.sort((a, b) => b.total_sell - a.total_sell);
-        allproducts && [...allproducts].sort((a, b) => b.sold_out - a.sold_out);
-      // console.log(d);
+               allproducts && [...allproducts].sort((a, b) => b.sold_out - a.sold_out);
+      
       setData(d);
     } else {
       const d =

@@ -24,6 +24,7 @@ import {
   PaymentPage
 } from "./Routes";
 import {
+  ShopPreview,
   ShopCreate,
   ShopLoginPage,
   ShopHomePage,
@@ -58,14 +59,15 @@ function App() {
     const sellerToken = Cookies.get("seller_token");
      Store.dispatch(getAllShopsEvennts());
      Store.dispatch(getAllProductss());
+    Store.dispatch(loadUser());
+    // Store.dispatch(loadSeller());
+    // if (token && !sellerToken) {
+    //   loadUser(dispatch);
+    // } else if (sellerToken) {
 
-    if (token && !sellerToken) {
-      loadUser(dispatch);
-    } else if (sellerToken) {
-
-      loadSeller(dispatch);
-    }
-  }, [location.pathname, dispatch]);
+    //   loadSeller(dispatch);
+    // }
+  }, [dispatch]);
 
   return (
     <>
@@ -78,7 +80,7 @@ function App() {
         />
         
         <Route path="/products" element={<ProductsPage />} />
-        <Route path="/product/:name" element={<ProductDetailPage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/order/success/:id" element={<OrderSucessPage />} />
         <Route path="/best-selling" element={<BestSelling />} />
         <Route path="/payment" element={<PaymentPage />} />
@@ -103,10 +105,11 @@ function App() {
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/" element={<HomePage />} />
 
+        <Route path="/shop/preview/:id" element={<ShopPreview/>}/>
+
         {/* Shop Routes */}
         <Route path="/shop-create" element={<ShopCreate />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
-        {/* <Route path="/dashboard" element={<DashboardScreen />} /> */} 
          <Route
           path="/activation/seller/:activation_token"
           element={<SellerActivationPage />}

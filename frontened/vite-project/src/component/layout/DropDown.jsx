@@ -9,7 +9,7 @@ const DropDown = ({allproducts,setDropDown}) => {
     console.log(allproducts)
 
     const handleSubmitt =(i)=>{
-        navigation(`/products?category=${i.category}`);
+        navigation(`/product/${i._id}`);
         setDropDown(false);
         window.location.reload();
     }

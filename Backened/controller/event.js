@@ -25,13 +25,8 @@ router.post(
         const files = req.files;
         const imageUrls = files.map((file) => `${file.filename}`);
         const eventData = req.body;
-        // console.log("product data is ",productData);
         eventData.images = imageUrls;
         eventData.shop = shop;
-        //  console.log("product data is ",productData);
-        // const cleanProductData = JSON.parse(JSON.stringify(productData));
-        // console.log(cleanProductData);
-        // const product = await Product.create(cleanProductData);
         const event = await Event.create(eventData);
         console.log("event  is correcly created ", event);
         res.status(201).json({

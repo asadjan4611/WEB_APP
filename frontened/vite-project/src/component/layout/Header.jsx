@@ -17,25 +17,35 @@ import { backned_Url } from "../../serverRoute.js";
 import Cart from "../Cart/Cart";
 import WishList from "../WishList/WishList";
 const Header = ({ activeHeading }) => {
+
+
   const { user, isAuthenticated } = useSelector((state) => state.user);
-  const {isSeller} = useSelector((state)=>state.seller);
-  const {allproducts}= useSelector((state)=>state.products);
-   const  {cart} = useSelector ((state)=>state.cart);
+  const { isSeller } = useSelector((state) => state.seller);
+  const { allproducts } = useSelector((state) => state.products);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishList } = useSelector((state) => state.wishList);
+
+  // console.log(isAuthenticated,user)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openWishList, setOpenWishList] = useState(false);
-  // console.log("searchData",searchData)
+
+
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    const filterData = allproducts && allproducts.filter(
-      (product) =>
-        product.name && product.name.toLowerCase().includes(term.toLowerCase())
-    );
+    const filterData =
+      allproducts &&
+      allproducts.filter(
+        (product) =>
+          product.name &&
+          product.name.toLowerCase().includes(term.toLowerCase())
+      );
     // console.log("filter data is ",filterData)
     setSearchData(filterData);
   };
@@ -82,9 +92,8 @@ const Header = ({ activeHeading }) => {
             {searchData && searchData.length !== 0 && (
               <div className="absolute top-[45px] left-0 w-full min-h-[40vh] bg-slate-50 shadow-sm z-[9] p-4">
                 {searchData.map((i, index) => {
-                  const product_name = i.name.replace(/\s+/g, "-");
                   return (
-                    <Link to={`/product/${product_name}`} key={index}>
+                    <Link to={`/product/${i._id}`} key={index}>
                       <div className="w-full flex items-center gap-4 py-2 hover:bg-gray-100 rounded">
                         <img
                           src={`${backned_Url}/uploads/${i.images[0]}`}
@@ -101,10 +110,10 @@ const Header = ({ activeHeading }) => {
           </div>
 
           <div className={`${styles.button} rounded-md ml-2`}>
-            <Link to={`${isSeller ?"/dashboard" :"/shop-create"}`}>
+            <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
               <h1 className="items-center flex text-white">
-              {`${isSeller ? "Go dashboard" :"Become Seller " }`}  
-                
+                {`${isSeller ? "Go dashboard" : "Become Seller "}`}
+
                 <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
@@ -136,10 +145,7 @@ const Header = ({ activeHeading }) => {
                 size={20}
               />
               {dropDown ? (
-                <DropDown
-                  allproducts={allproducts}
-                  setDropDown={setDropDown}
-                />
+                <DropDown allproducts={allproducts} setDropDown={setDropDown} />
               ) : null}
             </div>
           </div>
@@ -157,7 +163,7 @@ const Header = ({ activeHeading }) => {
               <div className="relative w-fit cursor-pointer mr-[15px]">
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                 <span className="absolute m-0 p-0  top-0 right-0 bg-green-400   text-white font-mono leading-tight text-center text-[15px]  rounded-full w-4 h-4 flex items-center justify-center">
-                  0
+                  {wishList && wishList.length}
                 </span>
               </div>
             </div>
@@ -173,9 +179,7 @@ const Header = ({ activeHeading }) => {
                   color="rgb(255 255 255 / 83%)"
                 />
                 <span className="absolute m-0 p-0  top-0 right-0 bg-green-400   text-white font-mono leading-tight text-center text-[15px]  rounded-full w-4 h-4 flex items-center justify-center">
-                  {
-                    cart && cart.length
-                  }
+                  {cart && cart.length}
                 </span>
               </div>
             </div>
@@ -187,7 +191,7 @@ const Header = ({ activeHeading }) => {
                 {isAuthenticated ? (
                   <Link to={"/profile"}>
                     <img
-                      className="h-[35px] w-[35]px] rounded-full"
+                      className="h-[35px] w-[35px] object-cover rounded-full"
                       src={`${backned_Url}/uploads/${user.avatar.url}`}
                       alt="asad jan"
                     />

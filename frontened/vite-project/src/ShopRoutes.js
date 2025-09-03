@@ -6,8 +6,10 @@ import ShopCreateProduct from "./component/shop/ShopCreateProduct";
 import ShopAllProducts from "./component/shop/ShopAllProducts";
 import ShopCreateEvent from "./component/shop/ShopCreateEvent"
 import ShopAllEvents from "./component/shop/ShopAllEvents"
-import CouponCode from "./component/shop/CouponCode.jsx"
+import CouponCode from "./component/shop/CouponCode"
+import ShopPreview from "./component/shop/ShopPreview"
 export {
+  ShopPreview,
   ShopHomePage,
   ShopLoginPage,
   ShopCreate,

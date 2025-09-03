@@ -6,8 +6,7 @@ import styles from "../../../style/style";
 import CountDown from "../CountDown/CountDown";
 import { backned_Url } from "../../../serverRoute";
 import { Link } from "react-router-dom";
-const Card = ({data}) => {
-  console.log("data  is",data);
+const Card = ({data,active}) => {
   return (
     <>
       <div className={`w-full p-2 bg-white ${active? "unset":"mb-12"} block lg:flex`}>
