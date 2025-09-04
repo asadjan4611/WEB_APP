@@ -73,14 +73,14 @@ router.post(
    try {
         console.log("welocome at function of deleting the product");
         const productId = req.params.id;
-        console.log(productId)
+        // console.log(productId)
         const productData = await Product.findById(productId);
-        console.log(productData);
+        // console.log(productData);
   
         productData.images.forEach((imageUrl) => {
          
           const filepath=path.join( process.cwd(),"uploads",imageUrl);
-          console.log(filepath);
+          // console.log(filepath);
           fs.unlink(filepath,(err)=>{
           if (err) {
               console.log(err)
@@ -91,7 +91,7 @@ router.post(
         );
           
         });
-        console.log("everything is okay")
+        // console.log("everything is okay")
 
         if (!productData) {
           return next( new ErrorHandler("product is not exist",400));  

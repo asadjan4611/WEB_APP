@@ -45,21 +45,26 @@ export const loadSeller = async (dispatch) => {
   }
 };
 
-export const updateUserInfo =(email,name, password, phoneNumber) => async (dispatch) => {
-  // console.log("welocome at dispatch")
+export const updateUserInfo =
+  (email, name, password, phoneNumber) => async (dispatch) => {
+    // console.log("welocome at dispatch")
     try {
       dispatch({
         type: "updateUserInfoRequest",
       });
-  //  console.log(email,password,name,phoneNumber)
-      const { data } = await axios.put(`${backned_Url}/api/user/updateUserInfo`,{
-        name,
-        email,
-        password,
-        phoneNumber
-      },{
-        withCredentials:true
-      });
+      //  console.log(email,password,name,phoneNumber)
+      const { data } = await axios.put(
+        `${backned_Url}/api/user/updateUserInfo`,
+        {
+          name,
+          email,
+          password,
+          phoneNumber,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       dispatch({
         types: "updateUserInfoSuccess",
@@ -68,6 +73,40 @@ export const updateUserInfo =(email,name, password, phoneNumber) => async (dispa
     } catch (error) {
       dispatch({
         type: "updateUserInfoFailure",
+        payload: error.response?.data?.message,
+      });
+    }
+  };
+
+export const updateUserAddress =
+  (country, city, address1, address2, zipCode, addressType) =>
+  async (dispatch) => {
+    try {
+      dispatch({
+        type: "updateUserAddressRequest",
+      });
+   console.log(country, city, address1, address2, zipCode, addressType);
+      const res = await axios.put(
+        `${backned_Url}/api/user/userAddressUpadte`,
+        {
+          country,
+          city,
+          address1,
+          address2,
+          zipCode,
+          addressType,
+        },{
+          withCredentials:true
+        }
+      );
+
+      dispatch({
+        type: "updateUserAddressSuccess",
+        payload: res.user,
+      });
+    } catch (error) {
+      dispatch({
+        type: "updateUserAddressFailure",
         payload: error.response?.data?.message,
       });
     }

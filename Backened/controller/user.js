@@ -131,13 +131,13 @@ router.post(
     }
   })
 );
-
+//get user
 router.get(
   "/getUser",
   isAuthorized,
   AsyncCatchError(async (req, res, next) => {
     try {
-      console.log("Everything is okay in function at get");
+      // console.log("Everything is okay in function at get");
 
       const user = await User.findById(req.user.id);
       // console.log(user)
@@ -148,7 +148,7 @@ router.get(
         success: true,
         user,
       });
-      console.log("Everything is okay in function at get");
+      // console.log("Everything is okay in function at get");
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
       console.log(error);
@@ -189,14 +189,14 @@ router.put(
   catchAsyncError(async (req, res, next) => {
     try {
       const { email, password, phoneNumber, name } = req.body;
-      const user = await User.findOne({email}).select("+password");
-  
+      const user = await User.findOne({ email }).select("+password");
+
       if (!user) {
         return next(new ErrorHandler("user is not exist in database", 500));
       }
 
       const isPassowrdValid = await user.comparePassword(password);
-     
+
       if (!isPassowrdValid) {
         return next(new ErrorHandler("Password is not correct", 500));
       }
@@ -205,7 +205,6 @@ router.put(
       user.email = email;
       user.phoneNumber = phoneNumber;
 
-      
       await user.save();
       res.status(200).json({
         success: true,
@@ -217,23 +216,77 @@ router.put(
   })
 );
 
+//update user image
 
-router.post("/update-user-avatar",upload.single("image"),AsyncCatchError(async(req,res,next)=>{
-  try {
-    const existUser = await User.findById(req.user.id);
-    const existAvatarPath = `uploads/${existUser.avatar}`;
-    fs.unlinkSync(existAvatarPath); 
-    const fileUrl = path.join(req.file.filename);
-    const user = await User.findByIdAndUpdate(req.user.id,{
-      avatar:fileUrl
-     });
+router.put(
+  "/update-user-avatar",
+  isAuthorized,
+  upload.single("image"),
+  AsyncCatchError(async (req, res, next) => {
+    try {
+      const existUser = await User.findById(req.user.id);
+      if (!existUser) {
+        return next(new ErrorHandler("User is not found", 400));
+      }
 
-     res.status(200).json({
-      success:true,
-      user
-     });
-  } catch (error) {
-      return next(new ErrorHandler(error, 400)); 
-  }
-}))
+      const existAvatarPath = `uploads/${existUser.avatar.url}`;
+      fs.unlink(existAvatarPath, async (err) => {
+        if (err) {
+          return next(new ErrorHandler(err, 400));
+        }
+      });
+      const newAvatar = {
+        public_url: req.file.filename,
+        url: req.file.filename,
+      };
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { avatar: newAvatar },
+        { new: true }
+      );
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
+//update address
+
+router.put(
+  "/userAddressUpadte",
+  isAuthorized,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user._id);
+      console.log("user is ", user);
+      console.log("req.body is ", req.body);
+      // checking address type  is  checking
+      const sameTypeAddress = user.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(`${req.body.addressType} address already exist`)
+        );
+      }
+      // add the address in array
+      user.addresses.push(req.body);
+        
+      await user.save({ validateModifiedOnly: true });
+      console.log("user after save", user);
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      console.log(error)
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
 module.exports = router;
