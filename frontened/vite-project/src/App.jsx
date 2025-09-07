@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import {
   BrowserRouter,
@@ -21,7 +21,7 @@ import {
   CheckOutPage,
   SellerActivationPage,
   OrderSucessPage,
-  PaymentPage
+  PaymentPage,
 } from "./Routes";
 import {
   ShopPreview,
@@ -33,7 +33,7 @@ import {
   ShopAllProducts,
   ShopCreateEvent,
   ShopAllEvents,
-  CouponCode
+  CouponCode,
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
@@ -44,12 +44,24 @@ import Store from "./assets/redux/store.js";
 import ShopProtectedRoute from "./ShopProtectedRoute/ShopProtectedRoute.jsx";
 import { getAllShopsEvennts } from "./assets/redux/actions/event.js";
 import { getAllProductss } from "./assets/redux/actions/product.js";
+import axios from "axios";
+import { backned_Url } from "./serverRoute.js";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
 
 function App() {
   const dispatch = useDispatch();
   const location = useLocation();
+  const [stripeapikey, setstripeapikey] = useState("");
 
   useEffect(() => {
+    async function getStripeKey() {
+      const { data } = await axios.get(
+        `${backned_Url}/api/stripe/stripeApiKey`
+      );
+      setstripeapikey(data.stripeApiKey);
+    }
     // Skip auth routes where loading isn't needed
     // const noAuthRoutes = ["/login", "/sign-up", "/"];
     // if (noAuthRoutes.includes(location.pathname)) return;
@@ -57,20 +69,27 @@ function App() {
     // Get tokens from cookies
     const token = Cookies.get("token");
     const sellerToken = Cookies.get("seller_token");
-     Store.dispatch(getAllShopsEvennts());
-     Store.dispatch(getAllProductss());
+    Store.dispatch(getAllShopsEvennts());
+    Store.dispatch(getAllProductss());
     Store.dispatch(loadUser());
-    // Store.dispatch(loadSeller());
-    // if (token && !sellerToken) {
-    //   loadUser(dispatch);
-    // } else if (sellerToken) {
+    Store.dispatch(loadSeller());
+    getStripeKey();
 
-    //   loadSeller(dispatch);
-    // }
   }, [dispatch]);
 
   return (
     <>
+      {stripeapikey && (
+        <Elements stripe={loadStripe(stripeapikey)}>
+          <Routes >
+            <Route path="/payment" element={
+               <ProtectedRoute>
+              <PaymentPage />
+               </ProtectedRoute>
+              } />
+          </Routes>
+        </Elements>
+      )}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
@@ -78,12 +97,11 @@ function App() {
           path="/activation/:activation_token"
           element={<ActivationPage />}
         />
-        
+
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/order/success/:id" element={<OrderSucessPage />} />
         <Route path="/best-selling" element={<BestSelling />} />
-        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/events" element={<EventPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route
@@ -98,19 +116,19 @@ function App() {
           path="/checkout"
           element={
             <ProtectedRoute>
-          <CheckOutPage />
+              <CheckOutPage />
             </ProtectedRoute>
           }
         />
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/shop/preview/:id" element={<ShopPreview/>}/>
+        <Route path="/shop/preview/:id" element={<ShopPreview />} />
 
         {/* Shop Routes */}
         <Route path="/shop-create" element={<ShopCreate />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
-         <Route
+        <Route
           path="/activation/seller/:activation_token"
           element={<SellerActivationPage />}
         />
@@ -164,7 +182,7 @@ function App() {
             </ShopProtectedRoute>
           }
         />
-         <Route
+        <Route
           path="/dashboard-coupans"
           element={
             <ShopProtectedRoute>
@@ -173,8 +191,6 @@ function App() {
           }
         />
       </Routes>
-
-      
 
       <ToastContainer
         position="top-right"

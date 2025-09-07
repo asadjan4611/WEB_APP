@@ -12,38 +12,42 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProduct } from "../../assets/redux/actions/product";
-import { addToWishList, removeFromWishList } from "../../assets/redux/actions/wishList";
+import {
+  addToWishList,
+  removeFromWishList,
+} from "../../assets/redux/actions/wishList";
 import { addToCart } from "../../assets/redux/actions/cart";
 
 const ProductDetail = ({ data }) => {
+  // console.log("object")
   // console.log(data.shopeId);
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(1);
   const navigate = useNavigate();
   const handleSubmitMessage = () => {};
   useEffect(() => {
     dispatch(getAllProduct(data.shopeId));
   }, []);
 
-    
-  const addToCartHandler =(data)=>{
-   dispatch(addToCart(data));
-   toast.success("Product is add in Cart")
-  }
+  const addToCartHandler = (data) => {
+    console.log("data that is trasfered to add to cart", data);
+    dispatch(addToCart(data));
+    toast.success("Product is add in Cart");
+  };
 
-    const addToWishListHandler =(data)=>{
-      setClick(!click);
-      dispatch(addToWishList(data));
-    }
-  
-    const removeFromWishListHandler =(data)=>{
+  const addToWishListHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishList(data));
+  };
+
+  const removeFromWishListHandler = (data) => {
     setClick(!click);
     dispatch(removeFromWishList(data));
-    }
-   
+  };
+
   const DecrementCount = () => {
     if (count > 1) {
       setCount(count - 1);
@@ -153,7 +157,7 @@ const ProductDetail = ({ data }) => {
                 </div>
               </div>
 
-              <div onClick={()=>addToCartHandler(data)}>
+              <div onClick={() => addToCartHandler({ ...data, count })}>
                 <button className={`${styles.button} gap-2 text-white`}>
                   Add to Cart
                   <AiOutlineShoppingCart size={25} />
@@ -161,14 +165,14 @@ const ProductDetail = ({ data }) => {
               </div>
 
               <div className="flex mt-8 justify-items-start items-start">
-                  <Link to={`/shop/preview/${data.shopeId}`}>
-                <div className="flex">
-                  <img
-                    src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
-                    className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
-                    alt="asad jan"
-                  />
-                
+                <Link to={`/shop/preview/${data.shopeId}`}>
+                  <div className="flex">
+                    <img
+                      src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
+                      className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
+                      alt="asad jan"
+                    />
+
                     <div>
                       <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
                         {data.shop.name}
@@ -180,9 +184,8 @@ const ProductDetail = ({ data }) => {
                         {data.shop.ratings} Rating
                       </h4>
                     </div>
-                  
-                </div>
-               </Link>
+                  </div>
+                </Link>
                 <div
                   onClick={handleSubmitMessage}
                   className={`${styles.button} bg-[#6443d1] ml-5 rounded h-11`}

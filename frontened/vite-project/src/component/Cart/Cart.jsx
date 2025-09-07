@@ -12,13 +12,14 @@ import { toast } from "react-toastify";
 const Cart = ({ setOpenCart }) => {
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
-  const totalPrice = () =>
+  const totalPrice =
     cart.reduce((acc, item) => {
-      acc + item.qty + item.discountPrice, 0;
-    });
+      // console.log(item);
+      return  acc + item.count * item.discountPrice
+    },0);
  
 
-    console.log(totalPrice)
+    // console.log(totalPrice)
   const quantityChangeHandler = (data) => {
     dispatch(addToCart(data));
   };
@@ -79,7 +80,7 @@ const Cart = ({ setOpenCart }) => {
               <div className="h-[45px] flex items-center justify-center w-[100%]  bg-[#e44343] rounded-[5px]">
                 <h1 className="text- text-[18px] font-[600]">
                   {/* CheckOut Now(USD${totalPrice}) */}
-                  `${totalPrice}`
+                  ${totalPrice}
                 </h1>
               </div>
             </Link>
@@ -93,34 +94,39 @@ const Cart = ({ setOpenCart }) => {
 };
 
 const CartSingle = ({ data, quantityChangeHandler,removeFromCartController  }) => {
-  const [value, setValue] = useState(data.qty);
+  const [value, setValue] = useState(data.count);
   const totalPrice = data.discountPrice * value;
+  // console.log(totalPrice)
   const increament = (data) => {
      if (data.stock<value) {
       toast.error("Product is out of Stock")
     } else {
       setValue(value + 1);
-    const updateCartUpadte = { ...data, qty: value + 1 };
+    const updateCartUpadte = { ...data, count: value + 1 };
       quantityChangeHandler(updateCartUpadte)
     }
   };
 
   const decrement = (data) => {
-    setValue(value - 1);
-    const updateCartUpadte = { ...data, qty: value + 1 };
+    const newValue = Math.max(1,value-1)
+   setValue(newValue);
+    const updateCartUpadte = { ...data, count: value - 1 };
     quantityChangeHandler(updateCartUpadte);
   };
   return (
     <div className="border-b p-2.5">
       <div className="w-full flex items-center justify-between">
         <div className="flex flex-col items-center mr-4">
+
+          {/* increament */}
           <div
             onClick={() => increament(data)}
             className={`justify-center cursor-pointer ${styles.noramlFlex} bg-[#e44343] border-[#e4434373] rounded-full w-[25px] h-[25px]`}
           >
             <HiPlus size={25} />
           </div>
-          <span className="p-2 text-[20px] pl-[10px]">{data.qty}</span>
+          {/* decrement */}
+          <span className="p-2 text-[20px] pl-[10px]">{data.count}</span>
           <div
             onClick={() => decrement(data)}
             className="bg-[#a7abb14f] h-[25px] w-[25px] flex justify-center items-center cursor-pointer"

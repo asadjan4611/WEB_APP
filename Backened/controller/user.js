@@ -276,7 +276,7 @@ router.put(
       }
       // add the address in array
       user.addresses.push(req.body);
-        
+
       await user.save({ validateModifiedOnly: true });
       console.log("user after save", user);
       res.status(200).json({
@@ -284,8 +284,61 @@ router.put(
         user,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
+//delete address of a user
+
+router.delete(
+  "/delete-address/:id",
+  isAuthorized,
+  catchAsyncError(async (req, res, next) => {
+    const userId = req.user.id;
+    const addressId = req.params.id;
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      { $pull: { addresses: { _id: addressId } } }
+    );
+    const user = await User.findById(userId);
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  })
+);
+
+// update user  password
+
+router.put(
+  "/updatePassword",
+  isAuthorized,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id).select("+password");
+      const passswordMatched = await user.comparePassword(req.body.oldPassword);
+      if (!passswordMatched) {
+        return next(new ErrorHandler("Old password is incorrect", 400));
+      }
+
+      if (req.body.newPassword !== req.body.confPassword) {
+        return next(
+          new ErrorHandler("Password does not match each Other", 500)
+        );
+      }
+
+      user.password = req.body.newPassword;
+      await user.save({ validateModifiedOnly: true });
+      res.status(200).json({
+        success: true,
+        message: "Password updated successfully",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 500));
     }
   })
 );

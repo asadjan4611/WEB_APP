@@ -48,7 +48,7 @@ export const getAllProduct = (id)=>async(dispatch)=>{
   } catch (error) {
     dispatch({
             type:"getAllProductsFailure",
-            payload:error.response.data.message
+            payload:error.response?.data?.message
         })
   console.log(error);
   }

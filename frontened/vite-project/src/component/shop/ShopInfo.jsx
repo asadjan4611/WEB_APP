@@ -3,51 +3,52 @@ import { useSelector } from "react-redux";
 import styles from "../../style/style";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { backned_Url } from "../../serverRoute";
 import Loader from "../layout/loader";
 const ShopInfo = ({ isOwner }) => {
   const shopeId = useParams();
   const id = shopeId.id;
-  // console.log(id)
+  const navigate = useNavigate();
   const [data, setData] = useState({});
-  const [loading, isLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    isLoading(true);
+    setLoading(true);
     axios
-      .get(`${backned_Url}/api/shop/get-shop-info/${id}`)
+      .get(`${backned_Url}/api/shop/get-shop-info/${id}`,{
+        withCredentials:true
+      })
       .then((res) => {
-        console.log(res);
         setData(res.data.sellerInfo);
-        isLoading(false);
+        setLoading(false);
       })
       .catch((err) => {
-        isLoading(false);
+        setLoading(false);
         toast.error(err);
       });
   }, []);
 
   const logoutHander = async () => {
     try {
-      const res = await axios.get(`${backned_Url}/api/shop/logout-seller`);
-      if (res.data === "success") {
-        <Navigate to={"/login-shop"} />;
-      }
+      const res = await axios.get(`${backned_Url}/api/shop/logout-seller`,{
+        withCredentials:true
+      }).then((res)=>{
+    
+        navigate("/shop-login");
+     
+    });
     } catch (error) {
       toast.error(error);
     }
   };
-
-  // console.log(seller.avatar.url);
-  console.log(data)
   return (
-    <>
+    loading ? <Loader/> :  <>
  
        <div>
       <div className="w-full py-5">
         <div className="w-full flex items-center justify-center">
           <img
-            src={`${backned_Url}/uploads/${data.avatar.public_id}`}
+            src={data.avatar ? `${backned_Url}/uploads/${data.avatar.url}`  : " "}
             className="w-[150px] h-[150px] object-cover rounded-full"
             alt="asadjan"
           />
@@ -76,7 +77,9 @@ const ShopInfo = ({ isOwner }) => {
       </div>
       <div className="p-3">
         <h2 className="font-[500px] "> Joined on</h2>
-        <h3 className="text-[#000000a6]">{data.createdAt.slice(0,10)}</h3>
+        <h3 className="text-[#000000a6]">
+          {data?.createdAt ? data.createdAt.slice(0, 10) : ""}
+          </h3>
       </div>
 
       {isOwner && (
@@ -94,6 +97,7 @@ const ShopInfo = ({ isOwner }) => {
       )}
     </div>
     </>
+   
   );
    
 

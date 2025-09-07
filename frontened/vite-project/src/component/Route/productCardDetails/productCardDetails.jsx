@@ -43,9 +43,9 @@ const ProductCardDetails = ({ setOpen, data }) => {
    if (count> data.stock) {
     toast.error("Product Limit is outreached!!!")
    }else{
-     const cartData= {...data,qty:count}
+     const cartData= {...data,count:count}
     dispatch(addToCart(cartData))
-    // console.log(cartData)
+    // console.log("cart Data is ",cartData)
     toast.success("Item is added in Cart .. ")
    }
    }

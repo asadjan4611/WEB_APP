@@ -33,7 +33,9 @@ const {wishList}= useSelector((state)=>state.wishList);
   }
 
   const addToCartHandler = (data)=>{
-    dispatch(addToCart(data));
+    const cartData= {...data,count:1}
+    // console.log(cartData);
+    dispatch(addToCart(cartData));
     toast.success("Product  is add in Cart")
   }
 

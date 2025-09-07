@@ -8,13 +8,14 @@ import { MdOutlineTrackChanges } from "react-icons/md";
 import { TbAddressBook } from "react-icons/tb"; 
 import { HiOutlineReceiptRefund, HiOutlineShoppingBag } from 'react-icons/hi';
 import { AiOutlineCreditCard, AiOutlineLogout, AiOutlineMessage } from 'react-icons/ai';
+import { backned_Url } from '../../serverRoute';
 
 const ProfileSideBar = ({active,setActive}) => {
    const naviagte = useNavigate();
    const location = useLocation();
+   
    const logoutHandler=()=>{
-    console.log("logout function is called")
-      axios.get(`http://localhost:8000/api/user/logout`,{
+      axios.get(`${backned_Url}/api/user/logout`,{
         withCredentials:true
      }).then((res)=>{
         toast.success(res.data.message);
@@ -25,7 +26,7 @@ const ProfileSideBar = ({active,setActive}) => {
      })
    }
 
-    const navigate = useNavigate();
+  
   return (
     <div className='w-full bg-white rounded-[10px] p-4 pt-8 shadow-sm'>
       <div 
@@ -78,7 +79,7 @@ const ProfileSideBar = ({active,setActive}) => {
       className="flex utem-center cursor-pointer w-ful mb-8">
         <AiOutlineCreditCard size={21} color={active ===6 ? "red":""}/>
         <span className={`pl-3 ${active ===6 ? "text-red-500" :""}`}>
-         Payment Method
+          Change Passowrd
         </span>
       </div>
 

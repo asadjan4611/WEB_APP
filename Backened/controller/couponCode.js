@@ -41,9 +41,9 @@ router.get(
       console.log("welcome at get function ");
       const coupanId = req.params.id;
       const coupans = await CouponCode.find({
-       "seller._id":coupanId
+        "seller._id": coupanId,
       });
-    //   console.log(coupans);
+      //   console.log(coupans);
 
       res.status(200).json({
         sucess: true,
@@ -55,15 +55,33 @@ router.get(
   })
 );
 
-
-router.delete("/delete-coupan/:id"
-    ,isSeller
-    ,catchAsyncError(async(req,res,next)=>{
-    const coupanId= req.params.id;
+router.delete(
+  "/delete-coupan/:id",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    const coupanId = req.params.id;
     const coupan = await CouponCode.findByIdAndDelete(coupanId);
     res.status(200).json({
-        sucess:true,
-        message:"Deleted Successfully"
+      sucess: true,
+      message: "Deleted Successfully",
     });
-}));
+  })
+);
+
+router.get(
+  "/coupan-verified/:name",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const coupanName = req.params.name;
+      const coupanCode = await CouponCode.findOne({ name: req.params.name });
+      // console.log("everything is okay")
+      res.status(200).json({
+        success: true,
+        coupanCode,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
 module.exports = router;

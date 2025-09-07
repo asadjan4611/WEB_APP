@@ -22,15 +22,18 @@ const AllCoupans = () => {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState("");
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState("");
   const [coupans, setCoupans] = useState([]);
-  const [minAmount, setMinAmount] = useState(null);
-  const [maxAmount, setMaxAmount] = useState(null);
+  const [minAmount, setMinAmount] = useState("");
+  const [maxAmount, setMaxAmount] = useState("");
   const { products } = useSelector((state) => state.products);
   const { seller } = useSelector((state) => state.seller);
-  //   console.log(products)
+    // console.log(products)
   const dispatch = useDispatch();
   useEffect(() => {
+  
+       dispatch(getAllProduct(seller._id))
+     
     const isGetCoupan = async () => {
       // console.log(seller._id);
       setIsLoading(true);
@@ -41,7 +44,6 @@ const AllCoupans = () => {
         })
         .then((res) => {
           setIsLoading(false);
-          toast.success("sucessfully getting all coupans  ");
           setCoupans(res.data.coupans);
         })
         .catch((err) => {
@@ -88,7 +90,7 @@ const AllCoupans = () => {
         }
       )
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         toast.success("Coupan is Successfully Created");
         setOpen(false);
         window.location.reload();

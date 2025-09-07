@@ -21,7 +21,7 @@ export const loadUser = () => async (dispatch) => {
   }
 };
 
-export const loadSeller = async (dispatch) => {
+export const loadSeller =()=> async (dispatch) => {
   // console.log("Welcome at load user function")
   try {
     dispatch({
@@ -38,9 +38,10 @@ export const loadSeller = async (dispatch) => {
       payload: res.data.seller,
     });
   } catch (error) {
+    // console.log(error)
     dispatch({
       type: "loadSellerFailure",
-      payload: error.data?.response.message,
+      payload: error.response?.data?.message,
     });
   }
 };
@@ -86,7 +87,7 @@ export const updateUserAddress =
         type: "updateUserAddressRequest",
       });
    console.log(country, city, address1, address2, zipCode, addressType);
-      const res = await axios.put(
+      const {res} = await axios.put(
         `${backned_Url}/api/user/userAddressUpadte`,
         {
           country,
@@ -102,7 +103,10 @@ export const updateUserAddress =
 
       dispatch({
         type: "updateUserAddressSuccess",
-        payload: res.user,
+        payload:{
+          updateSuccessMessage:"Update user address",
+          user:res.user
+        }
       });
     } catch (error) {
       dispatch({
@@ -111,3 +115,22 @@ export const updateUserAddress =
       });
     }
   };
+
+
+  export const deleteAddress=(id)=>async(dispatch)=>{
+    try {
+      dispatch({
+        type:"deleteUserAddressRequest"
+      });
+      const {data}=await axios.delete(
+        `${backned_Url}/api/user/delete-address/${id._id}`,{
+          withCredentials:true
+        });
+        // console.log(data)
+    } catch (error) {
+      dispatch({
+        type:"deleteUserAddressFailure",
+        payload:error.response?.data?.message
+      });
+    }
+  }

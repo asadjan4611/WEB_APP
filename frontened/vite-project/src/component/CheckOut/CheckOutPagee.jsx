@@ -7,13 +7,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import styles from "../../style/style";
 import { server } from "../../folder/server";
-
+import { backned_Url } from "../../serverRoute";
 const Checkout = () => {
-    const totalPrice =0;
-    const subTotalPrice=0;
-    const shipping=0;
-    const discountPercentenge=0;
   const { user } = useSelector((state) => state.user);
+  const { cart } = useSelector((state) => state.cart);
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [userInfo, setUserInfo] = useState(false);
@@ -22,7 +19,7 @@ const Checkout = () => {
   const [zipCode, setZipCode] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
-  const [discountPrice, setDiscountPrice] = useState(null);
+  const [discountPrice, setDiscountPrice] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,52 +27,105 @@ const Checkout = () => {
   }, []);
 
   const paymentSubmit = () => {
-   if(address1 === "" || address2 === "" || zipCode === null || country === "" || city === ""){
-      toast.error("Please choose your delivery address!")
-   } else{
-    const shippingAddress = {
-      address1,
-      address2,
-      zipCode,
-      country,
-      city,
-    };
+    if (
+      address1 === "" ||
+      address2 === "" ||
+      zipCode === null ||
+      country === "" ||
+      city === ""
+    ) {
+      toast.error("Please choose your delivery address!");
+    } else {
+      const shippingAddress = {
+        address1,
+        address2,
+        zipCode,
+        country,
+        city,
+      };
 
-  
-    const orderData = {
-       cart,
-      totalPrice,
-      subTotalPrice,
-      shipping,
-      discountPrice,
-      shippingAddress,
-      user,
+      const orderData = {
+        cart,
+        totalPrice,
+        subTotalPrice,
+        discountPrice,
+        shipping,
+        shippingAddress,
+        user,
+      };
+
+      // update local storage or save last order
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
+      navigate("/payment");
     }
-
-    // update local storage with the updated orders array
-    // localStorage.setItem("latestOrder", JSON.stringify(orderData));
-    // navigate("/payment");
-   }
   };
-  // const subTotalPrice = cart.reduce(
-  //   (acc, item) => acc + item.qty * item.discountPrice,
-  //   0
-  // );
-
-  // // this is shipping cost variable
-  // const shipping = subTotalPrice * 0.1;
+  const subTotalPrice = cart.reduce(
+    (acc, item) => acc + Number(item.count) * Number(item.discountPrice),
+    0
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const name = couponCode;
+    await axios
+      .get(`${backned_Url}/api/coupan/coupan-verified/${name}`)
+      .then((res) => {
+        if (res.data.coupanCode === null) {
+          toast.error("Coupan Code does not exist");
+          setCouponCode("");
+          set;
+        }
+        const shopeId = res.data.coupanCode?.seller._id;
+        // console.log(shopeId)
+        const CoupanCodeValue = res.data.coupanCode?.value;
+        if (res.data.coupanCode !== null) {
+          const isCoupanvalid =
+            cart && cart.filter((item) => item.shop._id === shopeId);
+          //  console.log(isCoupanvalid)
+          if (!isCoupanvalid) {
+            toast.error("Coupan Code is not valid for this shop");
+            setCouponCode("");
+            setDiscountPrice("");
+          }
+          if (isCoupanvalid.length === 0) {
+            toast.error("Coupan Code is not valid for this shop");
+            setCouponCode("");
+            setDiscountPrice("");
+          } else {
+            const eligiblePrice = isCoupanvalid.reduce(
+              (acc, item) => acc + item.count * item.discountPrice,
+              0
+            );
 
-  }
+            const discountPrice = (eligiblePrice * CoupanCodeValue) / 100;
 
+            setDiscountPrice(discountPrice);
+            setCouponCodeData(res.data.coupanCode);
+          }
+        }
+      })
+      .catch((err) => {
+        toast.error(err.response?.data?.message);
+      });
+  };
 
+  // this  will be shiping price for exapmle if your order is 50$ then shipping will be 5$
+  const shipping = (subTotalPrice * 0.1).toFixed(2);
+
+  const discountPercentengePrice = couponCodeData ? discountPrice : "";
+  const totalPrice = couponCodeData
+    ? (
+        Number(subTotalPrice) +
+        Number(shipping) -
+        discountPercentengePrice
+      ).toFixed(2)
+    : Number(subTotalPrice) + Number(shipping);
 
   return (
-    <div className="w-full flex flex-col items-center py-8">
-      <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
-        <div className="w-full 800px:w-[65%]">
+    <div className="w-full flex flex-col items-center py-5">
+      <div className="w-[90%] lg:w-[70%] block md:flex">
+        {/* shipingInfo */}
+        <div className="w-full md:w-[65%]">
           <ShippingInfo
             user={user}
             country={country}
@@ -92,7 +142,9 @@ const Checkout = () => {
             setZipCode={setZipCode}
           />
         </div>
-        <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
+
+        {/* cartData */}
+        <div className="w-full md:w-[35%] md:mt-0 mt-10">
           <CartData
             handleSubmit={handleSubmit}
             totalPrice={totalPrice}
@@ -100,12 +152,12 @@ const Checkout = () => {
             subTotalPrice={subTotalPrice}
             couponCode={couponCode}
             setCouponCode={setCouponCode}
-            discountPercentenge={discountPercentenge}
+            discountPercentengePrice={discountPercentengePrice}
           />
         </div>
       </div>
       <div
-        className={`${styles.button} w-[150px] 800px:w-[280px] mt-10`}
+        className={`${styles.button} w-[150px] md:w-[280px] mt-10`}
         onClick={paymentSubmit}
       >
         <h5 className="text-white">Go to Payment</h5>
@@ -278,27 +330,31 @@ const CartData = ({
   subTotalPrice,
   couponCode,
   setCouponCode,
-  discountPercentenge,
+  discountPercentengePrice,
 }) => {
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">xxxx-xxxx</h5>
+        <h5 className="text-[18px] font-[600]">${subTotalPrice}</h5>
       </div>
       <br />
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">xxxx-xxxx</h5>
+        <h5 className="text-[18px] font-[600]">${shipping}</h5>
       </div>
       <br />
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">
-          xxxx-xxxx
+          {" "}
+          -{" "}
+          {discountPercentengePrice
+            ? "$" + discountPercentengePrice.toString()
+            : ""}
         </h5>
       </div>
-      <h5 className="text-[18px] font-[600] text-end pt-3">xxxx-xxxx</h5>
+      <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
       <br />
       <form onSubmit={handleSubmit}>
         <input
