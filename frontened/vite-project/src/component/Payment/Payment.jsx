@@ -24,15 +24,60 @@ const Payment = () => {
     const orderData = JSON.parse(localStorage.getItem("latestOrder"));
     setOrderData(orderData);
   }, []);
-  const createOrder = (data, actions) => {
-    //
+  const createOrder = (data, action) => {
+    return action.order
+      .create({
+        purchase_units: [
+          {
+            description: "Sunflower",
+            amount: {
+              currency_code: "USD",
+              value: orderData?.totalPrice,
+            },
+          },
+        ],
+        application_context: {
+          shipping_preference: "NO_SHIPPING",
+        },
+      })
+      .then((orderId) => {
+        return orderId;
+      });
   };
 
   const onAprove = async (data, action) => {
     console.log("add");
   };
 
-  const paypalHandlertHandler = async (PaymentInfo) => {};
+  const paypalHandlertHandler = async (paymentInfo) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    order.paymentInfo = {
+      id: paymentInfo.payer_id,
+      status: "succeeded",
+      type: "Paypal",
+    };
+
+    await axios
+      .post(`${backned_Url}/api/order/create-order`, order, config, {
+        withCreditionals: true,
+      })
+      .then((res) => {
+        console.log(res);
+        setOpen(false);
+        navigate("/order/success");
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder ", JSON.stringify([]));
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(error);
+      });
+  };
 
   const paymentData = {
     amount: Math.round(orderData?.totalPrice * 100),
@@ -51,53 +96,53 @@ const Payment = () => {
       console.log("paymentData is ", paymentData);
       const config = {
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
         },
       };
-      const { data } = axios.post(
-        `${backned_Url}/api/stripe/process`,
-        config,
-        paymentData
+      const { data } = await axios.post(
+        "http://localhost:8000/api/stripe/process",
+        paymentData,
+        config
       );
-
       const client_secret = data.client_secret;
-      if (!stripe || !element) {
-        return;
-      }
-      const result = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: elements.getElements(CardNumberElement),
-        },
-      });
+      console.log(client_secret);
+      //   if (!stripe || !element) {
+      //     return;
+      //   }
+      //   const result = await stripe.confirmCardPayment(client_secret, {
+      //     payment_method: {
+      //       card: elements.getElements(CardNumberElement),
+      //     },
+      //   });
 
-      if (result?.error) {
-        toast.error(result?.error?.message);
-      } else {
-        if (result.paymentIntent.status === "succeded") {
-          toast.success("Payment is successfull");
-          order.paymentInfo = {
-            id: result.paymentIntent.id,
-            status: result.paymentIntent.status,
-            type: "credit Card",
-          };
+      //   if (result?.error) {
+      //     toast.error(result?.error?.message);
+      //   } else {
+      //     if (result.paymentIntent.status === "succeded") {
+      //       toast.success("Payment is successfull");
+      //       order.paymentInfo = {
+      //         id: result.paymentIntent.id,
+      //         status: result.paymentIntent.status,
+      //         type: "credit Card",
+      //       };
 
-          await axios
-            .post(`${backned_Url}/api/order/create-order`, order, config, {
-              withCreditionals: true,
-            })
-            .then((res) => {
-              console.log(res);
-              // setOpen(false);
-              // navigate("/order/success")
-              // localStorage.setItem("cartItems",JSON.stringify([]));
-              // localStorage.setItem("latestOrder ",JSON.stringify([]));
-            })
-            .catch((error) => {
-              console.log(error);
-              toast.error(error);
-            });
-        }
-      }
+      //   await axios
+      //     .post(`${backned_Url}/api/order/create-order`, order, config, {
+      //       withCreditionals: true,
+      //     })
+      //     .then((res) => {
+      //       console.log(res);
+      // setOpen(false);
+      // navigate("/order/success")
+      // localStorage.setItem("cartItems",JSON.stringify([]));
+      // localStorage.setItem("latestOrder ",JSON.stringify([]));
+      //     })
+      //     .catch((error) => {
+      //       console.log(error);
+      //       toast.error(error);
+      //     });
+      //     }
+      //   }
     } catch (error) {
       toast.error(error);
     }

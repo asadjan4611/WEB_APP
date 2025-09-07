@@ -7,6 +7,7 @@ router.post(
   "/process",
   catchAsyncError(async (req, res, next) => {
     console.log("Welocome at Payment Controller")
+    console.log("req.body is ",req.body);
     const myPayment = await stripe.paymentIntents.create({
       amount: req.body.amount,
       currency: "USD",
