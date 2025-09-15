@@ -6,52 +6,45 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
-
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-    origin:"http://localhost:5173",
-     credentials: true,
-}));
-app.use("/uploads",express.static("uploads"));
-app.use(bodyParser.urlencoded({extended:true}));
-
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+app.use("/uploads", express.static("uploads"));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //import Routes
 
-const user = require("./controller/user")
-const shop = require("./controller/shop")
-const product = require("./controller/product")
+const user = require("./controller/user");
+const shop = require("./controller/shop");
+const product = require("./controller/product");
 const event = require("./controller/event");
 const coupan = require("./controller/couponCode");
 const payment = require("./controller/payment");
 const order = require("./controller/order");
 
+app.use("/api/user", user);
+app.use("/api/product", product);
+app.use("/api/shop", shop);
+app.use("/api/event", event);
+app.use("/api/coupan", coupan);
+app.use("/api/stripe", payment);
+app.use("/api/order", order);
 
-
-
-app.use("/api/user",user);
-app.use("/api/product",product);
-app.use("/api/shop",shop);
-app.use("/api/event",event);
-app.use("/api/coupan",coupan);
-app.use("/api/stripe",payment);
-app.use("/api/order",order);
-
-
-
-
-//config 
+//config
 
 if (process.env.NODE_ENV !== "PROD") {
-    require("dotenv").config({
-        path:"/config/.env"
-    });
+  require("dotenv").config({
+    path: "/config/.env",
+  });
 }
 
-//its for errorhandler 
+//its for errorhandler
 
 app.use(ErrorHandler);
 
-module.exports = app
+module.exports = app;

@@ -10,7 +10,11 @@ import {
 import styles from "../../style/style";
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { MdOutlineAudiotrack, MdOutlineTrackChanges } from "react-icons/md";
+import {
+  MdOutlineAudiotrack,
+  MdOutlineTrackChanges,
+  MdTrackChanges,
+} from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { backned_Url } from "../../serverRoute";
 import {
@@ -22,21 +26,17 @@ import { toast } from "react-toastify";
 import { RxCross1 } from "react-icons/rx";
 import axios from "axios";
 import { Country, State, City } from "country-state-city";
+import { getUserOrder } from "../../assets/redux/actions/order";
 const ProfileContent = ({ active }) => {
   const dispatch = useDispatch();
   const location = useLocation();
-  console.log(active);
+
   const { user, updateSuccessMessage, error } = useSelector(
     (state) => state.user
   );
-  const [name, setName] = useState(user && user.name);
-  // console.log(updateSuccessMessage);
-  const [email, setEmail] = useState(user && user.email);
-  const [phoneNumber, setPhoneNumber] = useState(user && user.phoneNumber);
-  const [password, setPassword] = useState("");
-  const [avatar, setAvatar] = useState(null);
-  // console.log(State)
+
   useEffect(() => {
+    dispatch(getUserOrder(user?._id));
     if (error) {
       toast.error(error);
       dispatch({ type: "clearError" });
@@ -46,7 +46,15 @@ const ProfileContent = ({ active }) => {
       toast.success(updateSuccessMessage.updateSuccessMessage);
       dispatch({ type: "clearMessage" });
     }
-  }, [error, updateSuccessMessage]);
+  }, [error, updateSuccessMessage, user]);
+
+  const [name, setName] = useState(user && user.name);
+  const { userOrders } = useSelector((state) => state.order);
+  const [email, setEmail] = useState(user && user.email);
+  const [phoneNumber, setPhoneNumber] = useState(user && user.phoneNumber);
+  const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState(null);
+  // console.log(State)
 
   const handleImage = async (e) => {
     e.preventDefault();
@@ -169,7 +177,7 @@ const ProfileContent = ({ active }) => {
 
       {active === 2 && (
         <div>
-          <AllOrders />
+          <AllOrders userOrders={userOrders} />
         </div>
       )}
 
@@ -177,15 +185,15 @@ const ProfileContent = ({ active }) => {
 
       {active === 3 && (
         <div>
-          <AllRefundOrders />
+          <AllRefundOrders userOrders={userOrders} />
         </div>
       )}
 
-      {/* Active 5   Refund order*/}
+      {/* Active 5   track  order*/}
 
       {active === 5 && (
         <div>
-          <TrackOrders />
+          <TrackOrders userOrders={userOrders} />
         </div>
       )}
 
@@ -208,20 +216,7 @@ const ProfileContent = ({ active }) => {
   );
 };
 
-const AllOrders = () => {
-  const orders = [
-    {
-      _id: "873681723873213hwjkdh786",
-      orderItems: [
-        {
-          name: "Iphone 14 SSD 256",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
-
+const AllOrders = ({ userOrders }) => {
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -274,13 +269,13 @@ const AllOrders = () => {
 
   const row = [];
 
-  orders &&
-    orders.forEach((item) => {
+  userOrders &&
+    userOrders.forEach((item, i) => {
       row.push({
         id: item._id,
-        itemQty: item.orderItems.length,
+        itemQty: item.cart[0]?.count,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
   return (
@@ -296,20 +291,10 @@ const AllOrders = () => {
   );
 };
 
-const AllRefundOrders = () => {
-  const orders = [
-    {
-      _id: "873681723873213hwjkdh786",
-      orderItems: [
-        {
-          name: "Iphone 14 SSD 256",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
-
+const AllRefundOrders = ({ userOrders }) => {
+  const eligibleProducts =
+    userOrders &&
+    userOrders.filter((item) => item.status === "Refund Processing");
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -362,43 +347,29 @@ const AllRefundOrders = () => {
 
   const row = [];
 
-  orders &&
-    orders.forEach((item) => {
+  eligibleProducts &&
+    eligibleProducts.forEach((item, i) => {
       row.push({
         id: item._id,
-        itemQty: item.orderItems.length,
+        itemQty: item.cart[0]?.count,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
-
   return (
     <div className="pl-8 pt-1">
       <DataGrid
-        columns={columns}
         rows={row}
+        columns={columns}
         pageSize={10}
-        autoHeight
         disableSelectionOnClick
+        autoHeight
       />
     </div>
   );
 };
 
-const TrackOrders = () => {
-  const orders = [
-    {
-      _id: "873681723873213hwjkdh786",
-      orderItems: [
-        {
-          name: "Iphone 14 SSD 256",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
-
+const TrackOrders = ({ userOrders }) => {
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -437,9 +408,9 @@ const TrackOrders = () => {
       renderCell: (params) => {
         const orderId = params.row?.id;
         return orderId ? (
-          <Link to={`/user/order/${params.id}`}>
+          <Link to={`/user/track/order/${params.id}`}>
             <Button>
-              <MdOutlineTrackChanges size={20} />
+              <MdTrackChanges size={20} />
             </Button>
           </Link>
         ) : (
@@ -451,23 +422,23 @@ const TrackOrders = () => {
 
   const row = [];
 
-  orders &&
-    orders.forEach((item) => {
+  userOrders &&
+    userOrders.forEach((item, i) => {
       row.push({
         id: item._id,
-        itemQty: item.orderItems.length,
+        itemQty: item.cart[0]?.count,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
   return (
     <div className="pl-8 pt-1">
       <DataGrid
-        columns={columns}
         rows={row}
+        columns={columns}
         pageSize={10}
-        autoHeight
         disableSelectionOnClick
+        autoHeight
       />
     </div>
   );
@@ -498,7 +469,7 @@ const ChangePassword = () => {
       })
       .catch((error) => {
         toast.error(error.response?.data?.message);
-         setConfPassowrd("");
+        setConfPassowrd("");
         setNewPassword("");
         setOldPassword("");
       });
@@ -544,15 +515,14 @@ const ChangePassword = () => {
           <div className=" w-[100%] md:w-[50%] pt-3 mt-5">
             <label className="block pb-2 ">Enter your new Passowrd</label>
             <div className="relative">
-
-            <input
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              type={visible ? "text" : "password"}
-              className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
-            />
-            {visible ? (
+              <input
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                type={visible ? "text" : "password"}
+                className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
+              />
+              {visible ? (
                 <AiOutlineEye
                   className="absolute right-5 top-2.5 cursor-pointer"
                   size={20}
@@ -565,23 +535,21 @@ const ChangePassword = () => {
                   onClick={() => setVisible(true)}
                 />
               )}
-
             </div>
           </div>
 
           <div className=" w-[100%] md:w-[50%] pt-3 mt-5">
             <label className="block pb-2 ">Enter your Confirm Passowrd</label>
             <div className="relative">
+              <input
+                required
+                value={confPassword}
+                onChange={(e) => setConfPassowrd(e.target.value)}
+                type={visible ? "text" : "password"}
+                className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
+              />
 
-            <input
-              required
-              value={confPassword}
-              onChange={(e) => setConfPassowrd(e.target.value)}
-              type={visible ? "text" : "password"}
-              className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
-            />
-       
-            {visible ? (
+              {visible ? (
                 <AiOutlineEye
                   className="absolute right-5 top-2.5 cursor-pointer"
                   size={20}
@@ -594,7 +562,7 @@ const ChangePassword = () => {
                   onClick={() => setVisible(true)}
                 />
               )}
-                   </div>
+            </div>
           </div>
 
           <div className=" w-[100%] md:w-[50%] pt-3 mt-5">

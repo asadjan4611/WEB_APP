@@ -28,12 +28,11 @@ const AllCoupans = () => {
   const [maxAmount, setMaxAmount] = useState("");
   const { products } = useSelector((state) => state.products);
   const { seller } = useSelector((state) => state.seller);
-    // console.log(products)
+  // console.log(products)
   const dispatch = useDispatch();
   useEffect(() => {
-  
-       dispatch(getAllProduct(seller._id))
-     
+    dispatch(getAllProduct(seller._id));
+
     const isGetCoupan = async () => {
       // console.log(seller._id);
       setIsLoading(true);

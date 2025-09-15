@@ -13,6 +13,9 @@ import CheckOutPage from "./pages/CheckOutPage"
 import SellerActivationPage from "./pages/SellerActivationPage"
 import OrderSucessPage from "./pages/OrderSucessPage"
 import PaymentPage from "./pages/PaymentPage"
+ import UserOrderDetailsPage from "./pages/UserOrderDetailsPage"
+ import TrackOrderPage from "./pages/TrackOrderPage"
+
 export   {
     LoginPage,
     SignUpPage,
@@ -27,5 +30,7 @@ export   {
     CheckOutPage,
     SellerActivationPage,
     OrderSucessPage,
-    PaymentPage
+    PaymentPage,
+    UserOrderDetailsPage,
+    TrackOrderPage
 }

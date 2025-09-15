@@ -17,6 +17,7 @@ import {
   removeFromWishList,
 } from "../../assets/redux/actions/wishList";
 import { addToCart } from "../../assets/redux/actions/cart";
+import Rating from "./Rating";
 
 const ProductDetail = ({ data }) => {
   // console.log("object")
@@ -33,7 +34,6 @@ const ProductDetail = ({ data }) => {
   }, []);
 
   const addToCartHandler = (data) => {
-    console.log("data that is trasfered to add to cart", data);
     dispatch(addToCart(data));
     toast.success("Product is add in Cart");
   };
@@ -57,6 +57,16 @@ const ProductDetail = ({ data }) => {
   const Increament = () => {
     setCount(count + 1);
   };
+
+  const totalReviewLength =
+    products &&
+      products.reduce((acc, product) => acc + product.reviews.length, 0);
+
+  const totalRating = 
+      products &&
+      products.reduce((acc, product) => acc + product.reviews.reduce((sum,review)=>sum + review.rating,0), 0);
+
+ const  averageRating=totalRating/totalReviewLength || 0 ;
 
   return (
     <div className="bg-white">
@@ -181,7 +191,7 @@ const ProductDetail = ({ data }) => {
                       <h4
                         className={`${styles.shop_name} ml-3 top-0 bottom-0 `}
                       >
-                        {data.shop.ratings} Rating
+                        ({averageRating}/{totalReviewLength}) Rating
                       </h4>
                     </div>
                   </div>
@@ -199,7 +209,7 @@ const ProductDetail = ({ data }) => {
             </div>
           </div>
 
-          <ProductDetailsInfo data={data} products={products} />
+          <ProductDetailsInfo averageRating={averageRating} totalReviewLength={totalReviewLength} data={data} products={products} />
           <br />
           <br />
         </div>
@@ -208,9 +218,9 @@ const ProductDetail = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data, products }) => {
+const ProductDetailsInfo = ({averageRating,totalReviewLength, data, products }) => {
   const [active, setActive] = useState(1);
-
+  // console.log(data)
   return (
     <div className="bg-[#c4c7d2] w-full justify-between left-5 800px:px-10 py-2  rounded">
       <div className="w-full flex justify-between  border-b pt-10 pb-2">
@@ -263,8 +273,29 @@ const ProductDetailsInfo = ({ data, products }) => {
       ) : null}
 
       {active === 2 ? (
-        <div className="w-full justify-center min-h-[40vh] flex items-center">
-          <p>No Reviews yet</p>
+        <div className="w-full py-3 overflow-y-scroll min-h-[40vh] flex-col items-center">
+          {data.reviews.length !== 0 ? (
+            data.reviews.map((item, index) => (
+              <div className="w-full p-2  ml-5 flex  my-2 ">
+                <img
+                  className="w-[55px] h-[55px] rounded-full  object-cover"
+                  src={`${backned_Url}/uploads/${item.user.avatar.url}`}
+                  alt=""
+                />
+                <div className=" pl-5">
+                  <h5 className="text-[17px] font-bold">{item.user.name}</h5>
+                  <p>{item.comment}</p>
+                </div>
+                <div className="flex  mt-1 ml-4">
+                  <Rating ratings={item.rating} />
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-[20px] flex justify-center text-center mt-22 items-center">
+              No Reviews for this Product
+            </div>
+          )}
         </div>
       ) : null}
 
@@ -281,8 +312,8 @@ const ProductDetailsInfo = ({ data, products }) => {
                 />
                 <div className="ml-3">
                   <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                  <h4 className={`${styles.shop_name}`}>
-                    {data.shop.ratings} Rating
+                  <h4 className={`${styles.products}`}>
+                    ({averageRating}/{totalReviewLength}) Rating
                   </h4>
                 </div>
               </div>
@@ -313,7 +344,8 @@ const ProductDetailsInfo = ({ data, products }) => {
               </div>
               <div className="text-right">
                 <h5 className="font-[600]">
-                  Toatal Reviews :<span className="font-[500]">2023</span>
+                  Toatal Reviews :
+                  <span className="font-[500]">{totalReviewLength}</span>
                 </h5>
               </div>
 

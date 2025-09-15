@@ -9,9 +9,12 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { backned_Url } from "../../serverRoute";
+import { RxCross1 } from "react-icons/rx";
+import axios from "axios";
 const Payment = () => {
   const [orderData, setOrderData] = useState([]);
   const [open, setOpen] = useState(false);
@@ -46,7 +49,13 @@ const Payment = () => {
   };
 
   const onAprove = async (data, action) => {
-    console.log("add");
+    return action.order.capture().then(function (details) {
+      const { payer } = details;
+      let paymentInfo = payer;
+      if (paymentInfo !== undefined) {
+        paypalHandlertHandler(paymentInfo);
+      }
+    });
   };
 
   const paypalHandlertHandler = async (paymentInfo) => {
@@ -67,11 +76,11 @@ const Payment = () => {
         withCreditionals: true,
       })
       .then((res) => {
-        console.log(res);
         setOpen(false);
-        navigate("/order/success");
         localStorage.setItem("cartItems", JSON.stringify([]));
         localStorage.setItem("latestOrder ", JSON.stringify([]));
+        navigate("/order/success");
+        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
@@ -150,6 +159,28 @@ const Payment = () => {
 
   const cashOnDeleiveryHandler = async (e) => {
     e.preventDefault();
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    order.paymentInfo = {
+      type: "Cash on Delivery",
+    };
+
+    await axios
+      .post(`${backned_Url}/api/order/create-order`, order, config)
+      .then((res) => {
+        setOpen(false);
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder ", JSON.stringify([]));
+        navigate("/order/success");
+        window.location.reload();
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   return (
@@ -319,24 +350,38 @@ const PaymentInfo = ({
 
         {select === 2 && (
           <div className="w-full mt-5">
-            <form className="w-full" onSubmit={paymentHandler}>
-              <div className="w-full flex flex-col pb-3">
-                <div className="w-[50%]">
-                  <label className="block pb-3">PayPal mail</label>
-                  <input
-                    type="text"
-                    required
-                    className={`${styles.input} !w-[95%]`}
-                  />
-                </div>
+            <div
+              onClick={() => setOpen(true)}
+              className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[20px] font-[600px] `}
+            >
+              Pay Now
+            </div>
+            {open && (
+              <div className="w-full h-screen flex items-center justify-center z-[99999] fixed top-0 left-0 bg-[#00000039]">
+                <div className=" w-full md:w-[40%] md:h-[80vh] bg-white h-screen shadow flex flex-col justify-center overflow-y-scroll rounded-[5px] p-8 relative ">
+                  <div className="w-full flex justify-end">
+                    <RxCross1
+                      onClick={() => setOpen(false)}
+                      size={25}
+                      className=" absolute top-3 right-3 cursor-pointer"
+                    />
+                  </div>
 
-                <input
-                  type="submit"
-                  value="Submit"
-                  className={`${styles.button} !w-[20%] !h-[45px] !rounded-md text-white !bg-[#f63b60] mb-3 cursor-pointer`}
-                />
+                  <PayPalScriptProvider
+                    options={{
+                      "client-id":
+                        "AfOMkuXEzLRaNhT8NYsp7jBlB-DAh1GKsTCIP7QFJak489cxQSxqcYIQFIbUvRhJkfzW0_TqEqQdpusn",
+                    }}
+                  >
+                    <PayPalButtons
+                      style={{ layout: "vertical" }}
+                      onApprove={onAprove}
+                      createOrder={createOrder}
+                    ></PayPalButtons>
+                  </PayPalScriptProvider>
+                </div>
               </div>
-            </form>
+            )}
           </div>
         )}
       </div>
@@ -360,7 +405,7 @@ const PaymentInfo = ({
 
         {select === 3 && (
           <div className="w-full mt-5">
-            <form className="w-full" onSubmit={paymentHandler}>
+            <form className="w-full" onSubmit={cashOnDeleiveryHandler}>
               <div className="w-full">
                 <input
                   type="submit"
@@ -378,13 +423,6 @@ const PaymentInfo = ({
 
 const CardData = ({
   orderData,
-  //   handleSubmit,
-  //   totalPrice,
-  //   shipping,
-  //   subTotalPrice,
-  //   couponCode,
-  //   setCouponCode,
-  //   discountPercentengePrice,
 }) => {
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
@@ -401,10 +439,8 @@ const CardData = ({
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">
-          {" "}
-          -{" "}
-          {orderData.discountPrice
-            ? "$" + orderData.discountPrice.toString()
+          {orderData?.discountPrice
+            ? "- $" + orderData.discountPrice.toString()
             : ""}
         </h5>
       </div>
@@ -412,22 +448,6 @@ const CardData = ({
         ${orderData.totalPrice}
       </h5>
       <br />
-      <form>
-        <input
-          type="text"
-          className={`${styles.input} h-[40px] pl-2`}
-          placeholder="Coupoun code xxxx-xxxxx"
-          // value={}
-          // onChange={(e) => (e.target.value)}
-          required
-        />
-        <input
-          className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
-          required
-          value="Apply code"
-          type="submit"
-        />
-      </form>
     </div>
   );
 };

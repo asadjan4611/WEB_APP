@@ -103,7 +103,7 @@ router.post(
     }
   })
 );
-
+//login user
 router.post(
   "/login-user",
   AsyncCatchError(async (req, res, next) => {
@@ -263,8 +263,6 @@ router.put(
   catchAsyncError(async (req, res, next) => {
     try {
       const user = await User.findById(req.user._id);
-      console.log("user is ", user);
-      console.log("req.body is ", req.body);
       // checking address type  is  checking
       const sameTypeAddress = user.addresses.find(
         (address) => address.addressType === req.body.addressType
@@ -278,7 +276,6 @@ router.put(
       user.addresses.push(req.body);
 
       await user.save({ validateModifiedOnly: true });
-      console.log("user after save", user);
       res.status(200).json({
         success: true,
         user,

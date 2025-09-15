@@ -13,6 +13,7 @@ const { isAuthorized, isSeller } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const catchAsyncError = require("../middleware/catchAsyncError");
 
+//create shop
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
   try {
     // console.log("welcome at create shop function");
@@ -198,6 +199,44 @@ router.get(
   })
 );
 
+//update seller profile picture
+router.put(
+  "/update-seller-avatar",
+  upload.single("image"),
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      console.log("welcome at update profile picture");
+      const seller = await Shop.findById(req.user._id);
+      if (!seller) {
+        return next(
+          new ErrorHandler("Seller is not found please login first", 400)
+        );
+      }
+
+      const existAvatarPath = `uploads/${seller.avatar.url}`;
+      fs.unlink(existAvatarPath, async (err) => {
+        if (err) {
+          return next(new ErrorHandler(err, 403));
+        }
+      });
+      const newAvatar = {
+        public_url: req.file.filename,
+        url: req.file.filename,
+      };
+
+      seller.avatar = newAvatar;
+      await seller.save({ validateBeforeSave: false });
+      res.status(200).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
 //get shopInfo
 router.get(
   "/get-shop-info/:id",
@@ -206,10 +245,40 @@ router.get(
       const shopId = req.params.id;
       // console.log(shopId)
       const sellerInfo = await Shop.findById(shopId);
-        // console.log(sellerInfo)
+      // console.log(sellerInfo)
       res.status(200).json({
         success: true,
         sellerInfo,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
+
+// update shop
+
+router.put(
+  "/updateSellerInfo",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const { name, address, zipCode, phoneNumber, description } = req.body;
+      const seller = await Shop.findOne(req.user._id);
+
+      if (!seller) {
+        return next(new ErrorHandler("Seller is not exist in database", 500));
+      }
+
+      seller.name = name;
+      seller.address = address;
+      seller.phoneNumber = phoneNumber;
+      seller.zipCode = zipCode;
+      seller.description = description;
+      await seller.save({ validateBeforeSave: false });
+      res.status(200).json({
+        success: true,
+        seller,
       });
     } catch (error) {
       return next(new ErrorHandler(error, 400));

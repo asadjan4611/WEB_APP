@@ -1,0 +1,22 @@
+import React from 'react'
+import DashoardHeader from '../ShopComponents/layout/DashoardHeader'
+import DashboarSideBar from '../ShopComponents/layout/DashboarSideBar'
+import AllRefunds from "../ShopComponents/AllRefunds.jsx"
+const ShopAllRedunds = () => {
+  return (
+    <div>
+       <DashoardHeader/>
+          <div className="flex justify-between w-full">
+            <div className=' w-[80px] md:w-[230px]'>
+             <DashboarSideBar active={10}/>
+            </div>
+
+            <div className='flex justify-center w-full'>
+                <AllRefunds/>
+            </div>
+          </div>
+    </div>
+  )
+}
+
+export default ShopAllRedunds

@@ -62,8 +62,8 @@ const DashoardHeader = () => {
           {isSeller && (
             <Link to={`/seller/${seller._id}`}>
               <img
-                className="h-[35px] w-[35px] rounded-full"
-                src={`${backned_Url}/uploads/${seller.avatar.url}`}
+                className="h-[35px] w-[35px] object-cover  rounded-full"
+                src={`${backned_Url}/uploads/${seller?.avatar?.url}`}
                 alt="asad jan"
               />
             </Link>

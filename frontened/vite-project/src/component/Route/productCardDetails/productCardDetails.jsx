@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../../style/style";
-import { AiFillHeart, AiOutlineHeart, AiOutlineMessage, AiOutlineShoppingCart } from "react-icons/ai";
+import {
+  AiFillHeart,
+  AiOutlineHeart,
+  AiOutlineMessage,
+  AiOutlineShoppingCart,
+} from "react-icons/ai";
 import { backned_Url } from "../../../serverRoute";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../../assets/redux/actions/cart";
-import { addToWishList, removeFromWishList } from "../../../assets/redux/actions/wishList";
+import {
+  addToWishList,
+  removeFromWishList,
+} from "../../../assets/redux/actions/wishList";
 const ProductCardDetails = ({ setOpen, data }) => {
+  // console.log(data);
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
-  const {cart}= useSelector((state)=>state.cart);
- const {wishList}= useSelector((state)=>state.wishList);
-    const [select, setSelect] = useState(false);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishList } = useSelector((state) => state.wishList);
+  const { products } = useSelector((state) => state.products);
+  const [select, setSelect] = useState(false);
 
- useEffect(()=>{
-    if (wishList && wishList.find((i)=>i._id === data._id)) {
+  useEffect(() => {
+    if (wishList && wishList.find((i) => i._id === data._id)) {
       setClick(true);
-    }else{
+    } else {
       setClick(false);
     }
- },[wishList]);
+  }, [wishList]);
 
   const handleSubmittMessage = () => {};
   const DecrementCount = () => {
@@ -35,32 +45,47 @@ const ProductCardDetails = ({ setOpen, data }) => {
     setCount(count + 1);
   };
 
-  const addToCartHandler=(id)=>{
-   const isItemExist = cart && cart.find((i)=>i._id === id);
-   if (isItemExist) {
-    toast.error("Item is already exist in Cart!");
-   }else{
-   if (count> data.stock) {
-    toast.error("Product Limit is outreached!!!")
-   }else{
-     const cartData= {...data,count:count}
-    dispatch(addToCart(cartData))
-    // console.log("cart Data is ",cartData)
-    toast.success("Item is added in Cart .. ")
-   }
-   }
-  }
+  const addToCartHandler = (id) => {
+    const isItemExist = cart && cart.find((i) => i._id === id);
+    if (isItemExist) {
+      toast.error("Item is already exist in Cart!");
+    } else {
+      if (count > data.stock) {
+        toast.error("Product Limit is outreached!!!");
+      } else {
+        const cartData = { ...data, count: count };
+        dispatch(addToCart(cartData));
+        // console.log("cart Data is ",cartData)
+        toast.success("Item is added in Cart .. ");
+      }
+    }
+  };
 
-
-    const addToWishListHandler =(data)=>{
+  const addToWishListHandler = (data) => {
     setClick(!click);
     dispatch(addToWishList(data));
-  }
+  };
 
-  const removeFromWishListHandler =(data)=>{
-  setClick(!click);
-  dispatch(removeFromWishList(data));
-  }
+  const removeFromWishListHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishList(data));
+  };
+
+  const totalReviewLength =
+    products &&
+    products.reduce(
+      (acc, product) =>
+         acc + product.reviews.length, 0);
+  const totalRating =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce(
+          (sum, review) => sum + review.rating, 0),
+      0
+    );
+  const averageRating = totalRating/totalReviewLength || 0;
+
   return (
     <div className="bg-white">
       {data ? (
@@ -76,31 +101,31 @@ const ProductCardDetails = ({ setOpen, data }) => {
               {/* Left side  */}
               <div className=" block w-[50%] 800px:w-[50%]">
                 <img
-    
                   src={`${backned_Url}/uploads/${data.images[0]}`}
                   className="object-contain h-[70vh] px-2"
                   alt=""
                 />
-                  <Link to={`/shop/preview/${data.shopeId}`}>
-                <div className="flex">
-                  <img
-                    src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
-                    className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
-                    alt=""
-                  />
-                 
-                  <div>
-                    <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
-                      {data.shop.name}
-                    </h3>
+                <Link to={`/shop/preview/${data.shopeId}`}>
+                  <div className="flex">
+                    <img
+                      src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
+                      className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
+                      alt=""
+                    />
 
-                    <h3 className={`${styles.shop_name} ml-3 top-0 bottom-0 `}>
-                      {data.shop.ratings} Rating
-                    </h3>
+                    <div>
+                      <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
+                        {data.shop.name}
+                      </h3>
+
+                      <h3
+                        className={`${styles.shop_name} ml-3 top-0 bottom-0 `}
+                      >
+                        ({averageRating}/{totalReviewLength}) Rating
+                      </h3>
+                    </div>
                   </div>
-
-                </div>
-                 </Link>
+                </Link>
                 <div
                   onClick={handleSubmittMessage}
                   className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
@@ -156,7 +181,7 @@ const ProductCardDetails = ({ setOpen, data }) => {
                         color={click ? "red" : "#333"}
                         size={25}
                         className="mt-3 ml-2 cursor-pointer"
-                        onClick={() =>removeFromWishListHandler(data)}
+                        onClick={() => removeFromWishListHandler(data)}
                       />
                     ) : (
                       <AiOutlineHeart
@@ -167,15 +192,15 @@ const ProductCardDetails = ({ setOpen, data }) => {
                         title="Add to wishList"
                       />
                     )}
-
                   </div>
                 </div>
-                    <div
-                  onClick={()=>addToCartHandler(data._id)}
+                <div
+                  onClick={() => addToCartHandler(data._id)}
                   className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
                 >
                   <span className="text-white flex items-center">
-                    Add to Cart<AiOutlineShoppingCart size={28} className="ml-1" />
+                    Add to Cart
+                    <AiOutlineShoppingCart size={28} className="ml-1" />
                   </span>
                 </div>
               </div>

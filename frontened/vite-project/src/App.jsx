@@ -22,6 +22,8 @@ import {
   SellerActivationPage,
   OrderSucessPage,
   PaymentPage,
+  UserOrderDetailsPage,
+  TrackOrderPage,
 } from "./Routes";
 import {
   ShopPreview,
@@ -34,6 +36,10 @@ import {
   ShopCreateEvent,
   ShopAllEvents,
   CouponCode,
+  ShopOrderPage,
+  DashboardShopOrderPage,
+  ShopAllRedunds,
+  ShopSettingPage
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
@@ -48,7 +54,6 @@ import axios from "axios";
 import { backned_Url } from "./serverRoute.js";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
 
 function App() {
   const dispatch = useDispatch();
@@ -74,22 +79,24 @@ function App() {
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
     getStripeKey();
-
   }, [dispatch]);
 
   return (
     <>
-      {stripeapikey && (
+      {/* {stripeapikey && (
         <Elements stripe={loadStripe(stripeapikey)}>
-          <Routes >
-            <Route path="/payment" element={
-               <ProtectedRoute>
-              <PaymentPage />
-               </ProtectedRoute>
-              } />
+          <Routes>
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <PaymentPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Elements>
-      )}
+      )} */}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
@@ -100,7 +107,7 @@ function App() {
 
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
-        <Route path="/order/success/:id" element={<OrderSucessPage />} />
+        <Route path="/order/success/" element={<OrderSucessPage />} />
         <Route path="/best-selling" element={<BestSelling />} />
         <Route path="/events" element={<EventPage />} />
         <Route path="/faq" element={<FAQPage />} />
@@ -109,6 +116,23 @@ function App() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/order/:id"
+          element={
+            <ProtectedRoute>
+              <UserOrderDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user/track/order/:id"
+          element={
+            <ProtectedRoute>
+              <TrackOrderPage />
             </ProtectedRoute>
           }
         />
@@ -140,11 +164,29 @@ function App() {
             </ShopProtectedRoute>
           }
         />
+
+        <Route
+          path="/order/:id"
+          element={
+            <ShopProtectedRoute>
+              <ShopOrderPage />
+            </ShopProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
             <ShopProtectedRoute>
               <DashboardScreen />
+            </ShopProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard-orders"
+          element={
+            <ShopProtectedRoute>
+              <DashboardShopOrderPage />
             </ShopProtectedRoute>
           }
         />
@@ -187,6 +229,24 @@ function App() {
           element={
             <ShopProtectedRoute>
               <CouponCode />
+            </ShopProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard-refunds"
+          element={
+            <ShopProtectedRoute>
+              <ShopAllRedunds />
+            </ShopProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/setting"
+          element={
+            <ShopProtectedRoute>
+              <ShopSettingPage />
             </ShopProtectedRoute>
           }
         />

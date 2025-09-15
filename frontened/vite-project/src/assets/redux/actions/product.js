@@ -7,7 +7,6 @@ import axios from "axios"
 
 
 export const createProduct =(newForm)=>async(dispatch)=>{
-    console.log(newForm);
      try {
         dispatch({
             type:"productCreateRequest"

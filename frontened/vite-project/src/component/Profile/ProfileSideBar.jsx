@@ -11,7 +11,7 @@ import { AiOutlineCreditCard, AiOutlineLogout, AiOutlineMessage } from 'react-ic
 import { backned_Url } from '../../serverRoute';
 
 const ProfileSideBar = ({active,setActive}) => {
-   const naviagte = useNavigate();
+   const navigate = useNavigate();
    const location = useLocation();
    
    const logoutHandler=()=>{
@@ -70,7 +70,7 @@ const ProfileSideBar = ({active,setActive}) => {
       className="flex utem-center cursor-pointer w-ful mb-8">
         <MdOutlineTrackChanges size={21} color={active ===5 ? "red":""}/>
         <span className={`pl-3 ${active ===5 ? "text-red-500" :""}`}>
-         Tract Order
+         Track Order
         </span>
       </div>
 

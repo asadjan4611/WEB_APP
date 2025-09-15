@@ -8,6 +8,12 @@ import ShopCreateEvent from "./component/shop/ShopCreateEvent"
 import ShopAllEvents from "./component/shop/ShopAllEvents"
 import CouponCode from "./component/shop/CouponCode"
 import ShopPreview from "./component/shop/ShopPreview"
+import DashboardShopOrderPage from "./component/shop/DashboardShopOrderPage"
+import ShopOrderPage from './component/shop/ShopOrderDetailsPage'
+import ShopAllRedunds from './component/shop/ShopAllRedunds'
+import ShopSettingPage from './component/shop/ShopSettingPage.jsx'
+
+
 export {
   ShopPreview,
   ShopHomePage,
@@ -18,5 +24,9 @@ export {
   ShopAllProducts,
   ShopCreateEvent,
   ShopAllEvents,
-  CouponCode
+  CouponCode,
+  ShopOrderPage,
+  DashboardShopOrderPage,
+  ShopAllRedunds,
+  ShopSettingPage
 };

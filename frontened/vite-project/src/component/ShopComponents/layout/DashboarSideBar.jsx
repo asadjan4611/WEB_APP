@@ -191,7 +191,7 @@ const DashboarSideBar = ({ active }) => {
       </div>
 
        <div className="w-full flex items-center">
-        <Link to={"/dashboard-setting"} className="w-full flex items-center"> 
+        <Link to={"/setting"} className="w-full flex items-center"> 
           <CiSettings
           className="my-3"
             size={30}
