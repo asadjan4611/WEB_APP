@@ -8,7 +8,7 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 import { backned_Url } from "../../../serverRoute";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../../assets/redux/actions/cart";
@@ -16,8 +16,10 @@ import {
   addToWishList,
   removeFromWishList,
 } from "../../../assets/redux/actions/wishList";
+import axios from "axios";
 const ProductCardDetails = ({ setOpen, data }) => {
-  // console.log(data);
+  const {user,isAuthenticated} = useSelector((state)=>state.user);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
@@ -34,7 +36,41 @@ const ProductCardDetails = ({ setOpen, data }) => {
     }
   }, [wishList]);
 
-  const handleSubmittMessage = () => {};
+const handleSubmitMessage = async () => {
+  if (isAuthenticated) {
+    const userId = user._id;
+    const sellerId = data?.shop._id;
+
+    // ✅ check if conversation already exists
+    const existingConversation = conversations.find(
+      (c) =>
+        c.members.includes(userId) &&
+        c.members.includes(sellerId)
+    );
+
+    if (existingConversation) {
+      // 🔁 redirect to existing chat
+      navigate(`/user-inbox?${existingConversation._id}`);
+    } else {
+      // 🆕 create new conversation
+      const groupTitle = data._id + user._id;
+      try {
+        const res = await axios.post(
+          `${backned_Url}/api/conversation/create-new-conversation`,
+          { groupTitle, userId, sellerId },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        navigate(`/user-inbox?${res.data.conversation._id}`);
+      } catch (err) {
+        toast.error(err.response?.data.message);
+      }
+    }
+  } else {
+    toast.error("Please login first to create a conversation");
+  }
+};
+
   const DecrementCount = () => {
     if (count > 1) {
       setCount(count - 1);
@@ -127,7 +163,7 @@ const ProductCardDetails = ({ setOpen, data }) => {
                   </div>
                 </Link>
                 <div
-                  onClick={handleSubmittMessage}
+                  onClick={handleSubmitMessage}
                   className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
                 >
                   <span className="text-white flex items-center">

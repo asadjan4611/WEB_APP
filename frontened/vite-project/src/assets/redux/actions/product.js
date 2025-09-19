@@ -32,14 +32,12 @@ export const createProduct =(newForm)=>async(dispatch)=>{
 //get all products  of a specific shop
 
 export const getAllProduct = (id)=>async(dispatch)=>{
-  // console.log(id)
   try {
      dispatch({
        type: "getAllProductsRequest"
   });
 
-  const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products-shop/${id}`);
-  //  console.log(data)
+  const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products-shop/${id.id}`);
   dispatch({
     type:"getAllProductsSuccess",
     payload:data.products

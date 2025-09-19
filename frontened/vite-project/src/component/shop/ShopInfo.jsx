@@ -36,9 +36,7 @@ const ShopInfo = ({ isOwner }) => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${backned_Url}/api/shop/get-shop-info/${id}`, {
-        withCredentials: true,
-      })
+      .get(`${backned_Url}/api/shop/get-shop-info/${id}`,)
       .then((res) => {
         setData(res.data.sellerInfo);
         setLoading(false);
@@ -48,8 +46,6 @@ const ShopInfo = ({ isOwner }) => {
         toast.error(err);
       });
   }, [id]);
-  console.log(data);
-
   const logoutHander = async () => {
     try {
       const res = await axios
@@ -72,28 +68,28 @@ const ShopInfo = ({ isOwner }) => {
         <div className="w-full py-5">
           <div className="w-full flex items-center justify-center">
             <img
-              src={`${backned_Url}/uploads/${data?.avatar?.url}`}
+              // src={`${backned_Url}/uploads/${data.avatar.url}`}
               className="w-[150px] h-[150px] object-cover rounded-full"
               alt=""
             />
           </div>
-          <h1 className="text-center py-2 text-[20px]">{data.name}</h1>
+          <h1 className="text-center py-2 text-[20px]">{data?.name}</h1>
 
           <p className="text-[16px]  text-[#000000a6] flex items-center">
-            {data.description}
+            {data?.description}
           </p>
         </div>
         <div className="p-3">
           <h2 className="font-[500px] "> Address</h2>
-          <h3 className="text-[#000000a6]">{data.address}</h3>
+          <h3 className="text-[#000000a6]">{data?.address}</h3>
         </div>
         <div className="p-3">
           <h2 className="font-[500px] "> Phone Number</h2>
-          <h3 className="text-[#000000a6]">{data.phoneNumber}</h3>
+          <h3 className="text-[#000000a6]">{data?.phoneNumber}</h3>
         </div>
         <div className="p-3">
           <h2 className="font-[500px] "> Total Products</h2>
-          <h3 className="text-[#000000a6]">{products.length}</h3>
+          <h3 className="text-[#000000a6]">{products?.length}</h3>
         </div>
         <div className="p-3">
           <h2 className="font-[500px] ">Shop Rating</h2>

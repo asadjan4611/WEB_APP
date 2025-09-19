@@ -24,6 +24,7 @@ import {
   PaymentPage,
   UserOrderDetailsPage,
   TrackOrderPage,
+  UserInboxPage,
 } from "./Routes";
 import {
   ShopPreview,
@@ -39,7 +40,9 @@ import {
   ShopOrderPage,
   DashboardShopOrderPage,
   ShopAllRedunds,
-  ShopSettingPage
+  ShopSettingPage,
+  ShopInboxPage,
+  ShopWithDrawMoney
 } from "./ShopRoutes.js";
 import { ToastContainer, toast } from "react-toastify";
 import "./App.css";
@@ -54,12 +57,12 @@ import axios from "axios";
 import { backned_Url } from "./serverRoute.js";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
+import { conversationRequest } from "./assets/redux/actions/conversation.js";
 function App() {
   const dispatch = useDispatch();
   const location = useLocation();
   const [stripeapikey, setstripeapikey] = useState("");
-
+  const {user}=useSelector((state)=>state.user);
   useEffect(() => {
     async function getStripeKey() {
       const { data } = await axios.get(
@@ -78,6 +81,7 @@ function App() {
     Store.dispatch(getAllProductss());
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
+    Store.dispatch(conversationRequest(user));
     getStripeKey();
   }, [dispatch]);
 
@@ -141,6 +145,15 @@ function App() {
           element={
             <ProtectedRoute>
               <CheckOutPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user-inbox"
+          element={
+            <ProtectedRoute>
+              <UserInboxPage />
             </ProtectedRoute>
           }
         />
@@ -208,6 +221,14 @@ function App() {
         />
 
         <Route
+          path="/dashboard-messages"
+          element={
+            <ShopProtectedRoute>
+              <ShopInboxPage />
+            </ShopProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard-create-event"
           element={
             <ShopProtectedRoute>
@@ -242,7 +263,16 @@ function App() {
           }
         />
 
-         <Route
+        <Route
+          path="/dashboard-withdraw-money"
+          element={
+            <ShopProtectedRoute>
+              <ShopWithDrawMoney />
+            </ShopProtectedRoute>
+          }
+        />
+
+        <Route
           path="/setting"
           element={
             <ShopProtectedRoute>

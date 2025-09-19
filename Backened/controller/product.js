@@ -22,7 +22,6 @@ router.post(
       const shopeIdObj = req.body;
       const shopeId = shopeIdObj.shopeId;
       const shop = await Shop.findById(shopeId);
-      // console.log(shop._id)
       if (!shop) {
         return next(new ErrorHandler("Shop is Invalid", 400));
       } else {
@@ -51,11 +50,8 @@ router.get(
   "/get-all-products-shop/:id",
   AsyncCatchError(async (req, res, next) => {
     try {
-      // console.log("hi")
       const shopeId = req.params.id;
-      //  console.log(shopeId)
       const products = await Product.find({ shopeId: shopeId });
-      //  console.log(products)
       res.json({
         success: true,
         products,

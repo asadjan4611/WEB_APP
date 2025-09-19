@@ -8,12 +8,16 @@ import { getSellerOrder } from "../../assets/redux/actions/order";
 import { getAllProduct } from "../../assets/redux/actions/product";
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+import { backned_Url } from "../../serverRoute";
+import { toast } from "react-toastify";
 const Dashboradhero = () => {
     const dispatch = useDispatch();
     const {seller} = useSelector((state)=>state.seller);
     const {products}= useSelector((state)=>state.products);
     const {shopOrders} =  useSelector((state)=>state.order);
     const [deliveredData,setDeliveredData] = useState(null);
+   const [userBalance,setUserBalance] = useState(null);
 
     useEffect(()=>{
     dispatch(getSellerOrder(seller?._id));
@@ -23,12 +27,24 @@ const Dashboradhero = () => {
     const orderData = shopOrders && shopOrders?.filter((item)=>item.status === "Delivered");
     setDeliveredData(orderData);
 
-
+    
     },[dispatch]);
 
-    const totalEarningwithOutTax = shopOrders && shopOrders?.reduce((acc,item)=> acc+ item.totalPrice,0);
-    const serviecCharges = totalEarningwithOutTax*0.1;
-     const availableBalance =  totalEarningwithOutTax-serviecCharges;;
+    useEffect(()=>{
+
+      const getUserBalance= async()=>{
+        await axios.get(`${backned_Url}/api/shop/get-shop-info/${seller._id}`).then((res)=>{
+            setUserBalance(res.data.sellerInfo.availableBalance);
+        }).catch((err)=>{
+          toast.error(err.response.data?.message)
+        })
+      }
+      getUserBalance();
+    },[seller])
+
+    const totalEarningwithOutTax = userBalance;
+    // const serviecCharges = totalEarningwithOutTax*0.1;
+     const availableBalance = totalEarningwithOutTax
 
  const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -104,7 +120,7 @@ const Dashboradhero = () => {
           <h5 className="pt-2 pl-[36px] text-[22px] font-[500px] ">
             ${availableBalance}
           </h5>
-          <Link to={"/dashboard-withdram-money"}>
+          <Link to={"/dashboard-withdraw-money"}>
           <h5 className="pt-4 pl-2 text-[#077f9c]">
             WithDraw Money
           </h5>

@@ -5,6 +5,8 @@ const Order = require("../model/order");
 const { isAuthorized, isSeller } = require("../middleware/auth");
 const ErrorHandler = require("../utils/ErrorHandler");
 const Product = require("../model/product");
+const Shop = require("../model/shop");
+
 
 // create new Order
 
@@ -12,11 +14,7 @@ router.post(
   "/create-order",
   catchAsyncError(async (req, res, next) => {
     try {
-      // console.log("Welcome at order controller ");
-      // console.log("data from frontened is ",req.body);
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
-
-      // groupCart items by shopId
       const shopItemMap = new Map();
 
       for (const item of cart) {
@@ -97,15 +95,14 @@ router.put(
   catchAsyncError(async (req, res, next) => {
     try {
       console.log("welocome at function");
-      console.log(req.body);
       const id = req.params.id;
       const order = await Order.findById(id);
+
       if (!order) {
         return next(new ErrorHandler("Order not found  for this id", 400));
       }
       if (req.body.status === "Transferred to delivery partner") {
         order.cart.forEach(async (o) => {
-          console.log(o);
           await updateProduct(o._id, o.count);
         });
       }
@@ -114,6 +111,8 @@ router.put(
       if ((req.body.status = "Delivered")) {
         order.deliveredAt = Date.now();
         order.paymentInfo.status = "succeded";
+        const serviceCharge = order.totalPrice * .10;
+        await updateSellerInfo(order.totalPrice - serviceCharge);
       }
 
       await order.save({ validateBeforeSave: false });
@@ -127,7 +126,14 @@ router.put(
         product.sold_out += count;
 
         await product.save({ validateBeforeSave: false });
-        console.log("everything is okay");
+      }
+
+      async function updateSellerInfo(amount) {
+        const seller = await Shop.findById(req.user.id);
+        
+        seller.availableBalance = amount;
+
+        await seller.save();
       }
     } catch (error) {
       return next(new ErrorHandler(error, 400));

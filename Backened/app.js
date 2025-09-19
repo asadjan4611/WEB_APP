@@ -26,6 +26,10 @@ const event = require("./controller/event");
 const coupan = require("./controller/couponCode");
 const payment = require("./controller/payment");
 const order = require("./controller/order");
+const conversation = require("./controller/conversation");
+const messages = require("./controller/messages");
+const withDraw = require("./controller/withDraw");
+
 
 app.use("/api/user", user);
 app.use("/api/product", product);
@@ -34,6 +38,9 @@ app.use("/api/event", event);
 app.use("/api/coupan", coupan);
 app.use("/api/stripe", payment);
 app.use("/api/order", order);
+app.use("/api/conversation", conversation);
+app.use("/api/messages", messages);
+app.use("/api/withDraw", withDraw);
 
 //config
 

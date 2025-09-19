@@ -11,9 +11,9 @@ import ShopPreview from "./component/shop/ShopPreview"
 import DashboardShopOrderPage from "./component/shop/DashboardShopOrderPage"
 import ShopOrderPage from './component/shop/ShopOrderDetailsPage'
 import ShopAllRedunds from './component/shop/ShopAllRedunds'
-import ShopSettingPage from './component/shop/ShopSettingPage.jsx'
-
-
+import ShopSettingPage from './component/shop/ShopSettingPage'
+import ShopInboxPage from "./component/shop/ShopInboxPage"
+import ShopWithDrawMoney from "./component/shop/ShopWithDrawMoney.jsx"
 export {
   ShopPreview,
   ShopHomePage,
@@ -28,5 +28,7 @@ export {
   ShopOrderPage,
   DashboardShopOrderPage,
   ShopAllRedunds,
-  ShopSettingPage
+  ShopSettingPage,
+  ShopInboxPage,
+  ShopWithDrawMoney
 };

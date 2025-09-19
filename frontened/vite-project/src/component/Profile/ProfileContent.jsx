@@ -294,7 +294,7 @@ const AllOrders = ({ userOrders }) => {
 const AllRefundOrders = ({ userOrders }) => {
   const eligibleProducts =
     userOrders &&
-    userOrders.filter((item) => item.status === "Refund Processing");
+    userOrders.filter((item) => item.status === "Refund Processing" || item.status === "Refund Success");
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 

@@ -18,17 +18,53 @@ import {
 } from "../../assets/redux/actions/wishList";
 import { addToCart } from "../../assets/redux/actions/cart";
 import Rating from "./Rating";
-
+import { conversationRequest } from "../../assets/redux/actions/conversation";
 const ProductDetail = ({ data }) => {
-  // console.log("object")
-  // console.log(data.shopeId);
   const dispatch = useDispatch();
+  const { user,isAuthenticated } = useSelector((state) => state.user);
+    const {   conversation  } = useSelector((state) => state.conversation);
   const { products } = useSelector((state) => state.products);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const [count, setCount] = useState(1);
   const navigate = useNavigate();
-  const handleSubmitMessage = () => {};
+
+
+ const handleSubmitMessage = async () => {
+  if (isAuthenticated) {
+    const userId = user._id;
+    const sellerId = data?.shop._id;
+
+    // ✅ check if conversation already exists
+    const existingConversation = conversation.find(
+      (c) =>
+        c.members.includes(userId) &&
+        c.members.includes(sellerId)
+    );
+
+    if (existingConversation) {
+      // 🔁 redirect to existing chat
+      navigate(`/user-inbox?${existingConversation._id}`);
+    } else {
+      // 🆕 create new conversation
+      const groupTitle = data?.shop._id + user?._id;
+      try {
+        const res = await axios.post(
+          `${backned_Url}/api/conversation/create-new-conversation`,
+          { groupTitle, userId, sellerId },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        navigate(`/user-inbox?${res.data.conversation._id}`);
+      } catch (err) {
+        toast.error(err.response?.data.message);
+      }
+    }
+  } else {
+    toast.error("Please login first to create a conversation");
+  }
+};
+
   useEffect(() => {
     dispatch(getAllProduct(data.shopeId));
   }, []);

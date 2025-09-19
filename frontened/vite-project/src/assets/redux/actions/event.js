@@ -28,12 +28,11 @@ export const createEvent =(newForm)=>async(dispatch)=>{
 //getALlEvents
 export const getAllEvennts = (id)=>async(dispatch)=>{
   try {
-    // console.log(id.id);
      dispatch({
        type: "getAllEventRequest"
   });
 
-  const {data} = await axios.get(`http://localhost:8000/api/event/get-all-events-shop/${id}`);
+  const {data} = await axios.get(`http://localhost:8000/api/event/get-all-events-shop/${id.id}`);
   //  console.log(data);
   dispatch({
     type:"getAllEventsSuccess",

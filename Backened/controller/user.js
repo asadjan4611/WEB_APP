@@ -188,6 +188,7 @@ router.put(
   isAuthorized,
   catchAsyncError(async (req, res, next) => {
     try {
+      console.log("welcome at update  function");
       const { email, password, phoneNumber, name } = req.body;
       const user = await User.findOne({ email }).select("+password");
 
@@ -205,7 +206,7 @@ router.put(
       user.email = email;
       user.phoneNumber = phoneNumber;
 
-      await user.save();
+      await user.save({ validateBeforeSave: false });
       res.status(200).json({
         success: true,
         user,
@@ -336,6 +337,23 @@ router.put(
       });
     } catch (error) {
       return next(new ErrorHandler(error, 500));
+    }
+  })
+);
+
+// find user infoormation with the userId
+router.get(
+  "/user-info/:id",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.id);
+
+      res.status(201).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   })
 );

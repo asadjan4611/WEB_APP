@@ -153,7 +153,7 @@ router.post(
   })
 );
 
-//get user
+//get  seller
 router.get(
   "/getSeller",
   isSeller,
@@ -286,4 +286,71 @@ router.put(
   })
 );
 
+router.get(
+  "/seller-info/:id",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const seller = await Shop.findById(req.params.id);
+
+      res.status(201).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+
+// update seller withdraw methods --- sellers
+router.put(
+  "/update-payment-methods",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const { withdrawMethod } = req.body;
+
+      const seller = await Shop.findByIdAndUpdate(req.user._id, {
+        withdrawMethod,
+      });
+
+      res.status(201).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// delete seller withdraw merthods --- only seller
+router.delete(
+  "/delete-withdraw-method",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const seller = await Shop.findById(req.user._id);
+
+      if (!seller) {
+        return next(new ErrorHandler("Seller not found with this id", 400));
+      }
+
+      seller.withdrawMethod = null;
+
+      await seller.save({validateBeforeSave:false});
+
+      res.status(201).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+
+//get
 module.exports = router;
