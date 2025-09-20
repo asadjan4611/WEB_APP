@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import styles from '../style/style';
+import { backned_Url } from '../serverRoute';
 
 const ShopLogin = () => {
 
@@ -17,7 +18,7 @@ const ShopLogin = () => {
 const handleSubmit=async(e)=>{
           e.preventDefault();
       await axios.post(
-       `http://localhost:8000/api/shop/shop-login`,{
+       `${backned_Url}/api/shop/shop-login`,{
         email,
         password
        },{

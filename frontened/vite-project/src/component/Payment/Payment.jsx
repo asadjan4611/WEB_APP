@@ -103,7 +103,7 @@ const Payment = () => {
         headers: { "Content-Type": "application/json" },
       };
       const { data } = await axios.post(
-        "http://localhost:8000/api/stripe/process",
+        `${backned_Url}/api/stripe/process`,
         paymentData,
         config
       );

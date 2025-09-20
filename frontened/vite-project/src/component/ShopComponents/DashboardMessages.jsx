@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { backned_Url } from "../../serverRoute";
+import { backned_Url, Chat_Server_URl } from "../../serverRoute";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +9,7 @@ import { TfiGallery } from "react-icons/tfi";
 import { format } from "timeago.js";
 import socketID from "socket.io-client";
 
-const ENDPOINT = "http://localhost:4000";
+const ENDPOINT = `${Chat_Server_URl}`;
 const socketId = socketID(ENDPOINT, { transports: ["websocket"] });
 
 const DashboardMessages = () => {

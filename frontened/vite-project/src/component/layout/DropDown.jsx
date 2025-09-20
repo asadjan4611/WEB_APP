@@ -21,7 +21,7 @@ const DropDown = ({allproducts,setDropDown}) => {
          className={`${styles.noramlFlex}`} 
          onClick={()=>handleSubmitt(i)}
          key={index}>
-            <img src={`${backned_Url}/uploads/${i.images[0]}`}
+            <img src={`${i.images[0].url}`}
             style={{
                 width:"25px",
                 height:"25px",

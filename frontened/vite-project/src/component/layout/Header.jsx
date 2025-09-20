@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   AiOutlineHeart,
+  AiOutlineProfile,
   AiOutlineSearch,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
@@ -89,7 +90,7 @@ const Header = ({ activeHeading }) => {
                   <Link to={`/product/${i._id}`} key={index}>
                     <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-md transition">
                       <img
-                        src={`${backned_Url}/uploads/${i.images[0]}`}
+                        src={`${i.images[0].url}`}
                         alt=""
                         className="h-[42px] w-[42px] object-cover rounded"
                       />
@@ -199,7 +200,7 @@ const Header = ({ activeHeading }) => {
                   <img
                     className="h-[38px] w-[38px] object-cover rounded-full border-2 border-white hover:scale-105 transition"
                     src={`${user?.avatar.url}`}
-                    alt="profile"
+                    alt=""
                   />
                 </Link>
               ) : (

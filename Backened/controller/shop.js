@@ -16,7 +16,10 @@ const cloudinary = require("../cloudinary.js");
 //create shop
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
   try {
-    // console.log("welcome at create shop function");
+    const file = req.file
+    if (!file) {
+      return next(new ErrorHandler("Please select your profile image",500))
+    }
     const { email } = req.body;
     const sellerEmail = await Shop.findOne({ email });
     if (sellerEmail) {
@@ -25,42 +28,48 @@ router.post("/create-shop", upload.single("file"), async (req, res, next) => {
         message: "ShopEmail  is already exist",
       });
     }
-    const result = await cloudinary.v2.uploader.upload_stream(
-      { folder: "avatar" },
-      async (error, result) => {
-        if (error) return next(new ErrorHandler(error.message, 500));
-        const seller = {
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          avatar: {
-            url: result.secure_url,
-            public_id: result.public_id,
-          },
-          phoneNumber: req.body.phoneNumber,
-          zipCode: req.body.zipCode,
-          address: req.body.address,
-        };
-        const activationToken = createActivationToken(seller);
-        const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
 
-        try {
-          await sendMail({
-            email: seller.email,
-            subject: "Activate your Shop",
-            message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
-          });
-          res.status(200).json({
-            success: true,
-            message: `please check your email  to activate your shop`,
-          });
-        } catch (error) {
-          return next(new ErrorHandler(error.message, 500));
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.v2.uploader.upload_stream(
+        { folder: "avatar" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
         }
-      }
-    );
-    result.end(req.file.buffer);
+      );
+      stream.end(req.file.buffer);
+    });
+
+    const seller = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      avatar: {
+        url: result.secure_url,
+        public_id: result.public_id,
+      },
+      phoneNumber: req.body.phoneNumber,
+      zipCode: req.body.zipCode,
+      address: req.body.address,
+    };
+    const activationToken = createActivationToken(seller);
+    const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
+
+    try {
+      await sendMail({
+        email: seller.email,
+        subject: "Activate your Shop",
+        message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
+      });
+      res.status(200).json({
+        success: true,
+        message: `please check your email  to activate your shop`,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
   } catch (error) {
+    console.log(error);
     return next(new ErrorHandler(error.message, 400));
   }
 });
@@ -222,7 +231,7 @@ router.put(
           });
         }
       );
-        result.end(req.file.buffer);
+      result.end(req.file.buffer);
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }

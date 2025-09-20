@@ -12,6 +12,7 @@ import { RxCross1 } from "react-icons/rx";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styles from "../../style/style";
+import { backned_Url } from "../../serverRoute";
 
 const AllCoupans = () => {
   const [open, setOpen] = useState(false);
@@ -36,7 +37,7 @@ const AllCoupans = () => {
       setIsLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/coupan/get-coupans/${seller._id}`,
+          `${backned_Url}/api/coupan/get-coupans/${seller._id}`,
           { withCredentials: true }
         );
         setCoupans(res.data.coupans);
@@ -55,7 +56,7 @@ const AllCoupans = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:8000/api/coupan/delete-coupan/${id}`,
+        `${backned_Url}/api/coupan/delete-coupan/${id}`,
         { withCredentials: true }
       );
       toast.success("Coupon deleted successfully");
@@ -69,7 +70,7 @@ const AllCoupans = () => {
     e.preventDefault();
     try {
       await axios.post(
-        `http://localhost:8000/api/coupan/create-coupan`,
+        `${backned_Url}/api/coupan/create-coupan`,
         { name, minAmount, maxAmount, value, seller, selectedProduct },
         { withCredentials: true }
       );

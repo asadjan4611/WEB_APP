@@ -6,14 +6,14 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import socketID from "socket.io-client";
 import axios from "axios";
-import { backned_Url } from "../serverRoute";
+import { backned_Url, Chat_Server_URl } from "../serverRoute";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { format } from "timeago.js";
 import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
 import { TfiGallery } from "react-icons/tfi";
 import { conversationRequest } from "../assets/redux/actions/conversation";
-const ENDPOINIT = "http://localhost:4000";
+const ENDPOINIT = `${Chat_Server_URl}`;
 const socketId = socketID(ENDPOINIT, { transports: ["websocket"] });
 
 const UserInboxPage = () => {

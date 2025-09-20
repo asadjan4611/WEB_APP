@@ -10,7 +10,6 @@ import Footer from "../component/layout/Footer"
 import { useSelector } from 'react-redux';
  const HomePage = () => {
   const {user} = useSelector(state=>state.user);
-  console.log("user is",user)
 //   console.log("isAuth is true or not",isAuthenticated);
   return (
     <div>

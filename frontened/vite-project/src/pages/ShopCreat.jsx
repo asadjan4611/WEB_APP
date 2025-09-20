@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { RxAvatar } from "react-icons/rx";
 import styles from "../style/style";
+import { backned_Url } from "../serverRoute";
 
 const ShopCreate = () => {
   const naviagte = useNavigate();
@@ -39,16 +40,18 @@ const ShopCreate = () => {
 
     try {
       const config = { headers: { "Content-Type": "multipart/form-data" } };
-
+      // for(let [key,value] of newForm){
+      //   console.log("key and pair",key,value)
+      // }
     const res =await axios
-      .post(`http://localhost:8000/api/shop/create-shop`, newForm, config);
+      .post(`${backned_Url}/api/shop/create-shop`, newForm, config);
       // console.log("Your response is ",res.data.message);
-      toast.success(res.data.message);
+      toast.success(res.data?.message);
        naviagte("/shop-login");
       
     } catch (err) {
-       console.log("Error during signup:", err.response.data.message);
-       toast.error(err);
+       console.log("Error during signup:", err.response?.data?.message);
+       toast.error(err.response?.data?.message);
        setAvatar("");
        setEmail("");
        setName("");

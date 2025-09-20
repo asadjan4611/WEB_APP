@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { backned_Url } from '../serverRoute';
 
 const  SellerActivationPage = () => {
     const {activation_token} = useParams();
@@ -10,13 +11,12 @@ const  SellerActivationPage = () => {
         const activationEmail =async()=>{
                try {
                 setError(false);
-                const res =await axios.post(`http://localhost:8000/api/shop/seller/activation`,{
+                const res =await axios.post(`${backned_Url}/api/shop/seller/activation`,{
                     activation_token
                 });
                 if (res.data.success === false) {
                     setError(true);
                 }
-                console.log(res);
                } catch (error) {
                 console.log(error.response.data.message);
                 setError(true)

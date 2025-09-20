@@ -5,7 +5,7 @@ export const loadUser = () => async (dispatch) => {
   try {
     dispatch({ type: "loadUserRequest" });
 
-    const res = await axios.get("http://localhost:8000/api/user/getUser", {
+    const res = await axios.get(`${backned_Url}/api/user/getUser`, {
       withCredentials: true,
     });
     // console.log(res)
@@ -29,7 +29,7 @@ export const loadSeller =()=> async (dispatch) => {
     });
     // console.log("Welcome at load user function before api")
 
-    const res = await axios.get(`http://localhost:8000/api/shop/getSeller`, {
+    const res = await axios.get(`${backned_Url}/api/shop/getSeller`, {
       withCredentials: true,
     });
     // console.log("res is ",res.data.user)
