@@ -10,6 +10,7 @@ const ShopHomePage = () => {
         <div className="w-[28%] bg-[#fff] shadow-sm not-only-of-type:overflow-y-scroll h-screen sticky top-2 left-0 z-10">
           <ShopInfo isOwner={true} />
         </div>
+        <br />
         <div className="w-[75%] rounded-[4px]">
           <ShoProfileData isOwner={true} />
         </div>

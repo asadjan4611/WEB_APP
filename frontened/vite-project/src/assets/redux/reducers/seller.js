@@ -11,6 +11,7 @@ export const sellerReducer = createReducer(initialState, (builder) => {
   builder
     .addCase("loadSellerRequest", (state) => {
       state.isLoading = true;
+      state.isSeller = false;
     })
     .addCase("loadSellerSucessfully", (state, action) => {
       state.isLoading = false;

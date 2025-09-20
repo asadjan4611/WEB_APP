@@ -1,211 +1,51 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// import { styles } from "../../../style/style";
 import { RxDashboard } from "react-icons/rx";
-import styles from "../../../style/style";
-import { AiOutlineFolderAdd, AiOutlineGift, AiOutlineSetting } from "react-icons/ai";
+import { AiOutlineFolderAdd, AiOutlineGift } from "react-icons/ai";
 import { FiShoppingBag } from "react-icons/fi";
 import { VscNewFile } from "react-icons/vsc";
 import { MdOutlineLocalOffer } from "react-icons/md";
 import { CiMoneyBill, CiSettings } from "react-icons/ci";
-import { CircularProgress } from "@mui/material";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { HiOutlineReceiptRefund } from "react-icons/hi";
+
 const DashboarSideBar = ({ active }) => {
+  const menuItems = [
+    { id: 1, label: "Dashboard", icon: <RxDashboard size={22} />, link: "/dashboard" },
+    { id: 2, label: "All Orders", icon: <FiShoppingBag size={22} />, link: "/dashboard-orders" },
+    { id: 3, label: "All Products", icon: <RxDashboard size={22} />, link: "/dashboard-products" },
+    { id: 4, label: "Create Product", icon: <AiOutlineFolderAdd size={22} />, link: "/dashboard-create-product" },
+    { id: 5, label: "All Events", icon: <MdOutlineLocalOffer size={22} />, link: "/dashboard-events" },
+    { id: 6, label: "Create Event", icon: <VscNewFile size={22} />, link: "/dashboard-create-event" },
+    { id: 7, label: "Withdraw Money", icon: <CiMoneyBill size={22} />, link: "/dashboard-withdraw-money" },
+    { id: 8, label: "Shop Inbox", icon: <BiMessageSquareDetail size={22} />, link: "/dashboard-messages" },
+    { id: 9, label: "Discount Codes", icon: <AiOutlineGift size={22} />, link: "/dashboard-coupans" },
+    { id: 10, label: "Refunds", icon: <HiOutlineReceiptRefund size={22} />, link: "/dashboard-refunds" },
+    { id: 11, label: "Setting", icon: <CiSettings size={22} />, link: "/setting" },
+  ];
+
   return (
-    <div className="w-full h-[89vh] py-3 shadow-sm overflow-y-scroll sticky top-0 left-0 z-10">
-      <div className="w-full flex items-center">
-        <Link to={"/dashboard"} className="w-full flex items-center"> 
-          <RxDashboard
-          className="my-3"
-            size={25}
-            color={`${active === 1 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[800px] ${
-              active === 1 ? "text-[crimson]" : "text-[#555"
-            }`}
+    <div className="w-full h-[89vh] py-4 shadow-sm overflow-y-scroll sticky top-15 left-0 z-10 
+                    scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+      {menuItems.map((item) => (
+        <Link
+          key={item.id}
+          to={item.link}
+          className={`flex items-center px-4 py-3 mb-2 rounded-lg transition-all duration-200 group
+          ${active === item.id ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md" : "hover:bg-gray-100 text-gray-700"}`}
+        >
+          <div
+            className={`mr-3 transition-transform duration-200 group-hover:scale-110 
+            ${active === item.id ? "text-white" : "text-gray-600"}`}
           >
-            DashBoard
-          </h1>
+            {item.icon}
+          </div>
+          <span className={`hidden md:block font-medium text-[16px] 
+            ${active === item.id ? "text-white" : "text-gray-700"}`}>
+            {item.label}
+          </span>
         </Link>
-      </div>
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-orders"} className="w-full flex items-center"> 
-          <FiShoppingBag
-          className="my-3"
-            size={30}
-            color={`${active === 2 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 2 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-          All Orders
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-products"} className="w-full flex items-center"> 
-          <RxDashboard
-          className="my-3"
-            size={30}
-            color={`${active === 3 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 3 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-           All Products
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-create-product"} className="w-full flex items-center"> 
-          <AiOutlineFolderAdd
-          className="my-3"
-            size={30}
-            color={`${active === 4 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 4 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Create Product
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-events"} className="w-full flex items-center"> 
-          <MdOutlineLocalOffer
-          className="my-3"
-            size={30}
-            color={`${active === 5 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 5 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            All Events
-          </h1>
-        </Link>
-      </div>
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-create-event"} className="w-full flex items-center"> 
-          <VscNewFile
-          className="my-3"
-            size={30}
-            color={`${active === 6 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 6 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Create Event
-          </h1>
-        </Link>
-      </div>
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-withdraw-money"} className="w-full flex items-center"> 
-          <CiMoneyBill
-          className="my-3"
-            size={30}
-            color={`${active === 7 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 7 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Withdraw Money
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-messages"} className="w-full flex items-center"> 
-          <BiMessageSquareDetail
-          className="my-3"
-            size={30}
-            color={`${active === 8 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 8 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Shop Inbox
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-coupans"} className="w-full flex items-center"> 
-          <AiOutlineGift
-          className="my-3"
-            size={30}
-            color={`${active === 9 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 9 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Discount Codes
-          </h1>
-        </Link>
-      </div>
-
-
-       <div className="w-full flex items-center">
-        <Link to={"/dashboard-refunds"} className="w-full flex items-center"> 
-          <HiOutlineReceiptRefund
-          className="my-3"
-            size={30}
-            color={`${active === 10 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 10 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Refunds
-          </h1>
-        </Link>
-      </div>
-
-       <div className="w-full flex items-center">
-        <Link to={"/setting"} className="w-full flex items-center"> 
-          <CiSettings
-          className="my-3"
-            size={30}
-            color={`${active === 11 ? "crimson" : "#555"}`}
-          />
-          <h1
-            className={`hidden md:block my-2 pl-2 text-[20px] font-[400px] ${
-              active === 11 ? "text-[crimson]" : "text-[#555"
-            }`}
-          >
-            Setting
-          </h1>
-        </Link>
-      </div>
+      ))}
     </div>
   );
 };

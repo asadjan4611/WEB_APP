@@ -27,6 +27,9 @@ import { RxCross1 } from "react-icons/rx";
 import axios from "axios";
 import { Country, State, City } from "country-state-city";
 import { getUserOrder } from "../../assets/redux/actions/order";
+
+// ... your imports stay the same
+
 const ProfileContent = ({ active }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -41,7 +44,6 @@ const ProfileContent = ({ active }) => {
       toast.error(error);
       dispatch({ type: "clearError" });
     }
-
     if (updateSuccessMessage) {
       toast.success(updateSuccessMessage.updateSuccessMessage);
       dispatch({ type: "clearMessage" });
@@ -54,7 +56,6 @@ const ProfileContent = ({ active }) => {
   const [phoneNumber, setPhoneNumber] = useState(user && user.phoneNumber);
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
-  // console.log(State)
 
   const handleImage = async (e) => {
     e.preventDefault();
@@ -62,8 +63,7 @@ const ProfileContent = ({ active }) => {
     setAvatar(file);
 
     const formData = new FormData();
-    formData.append("image", e.target.files[0]);
-    // console.log(formData)
+    formData.append("file", e.target.files[0]);
 
     await axios
       .put(`${backned_Url}/api/user/update-user-avatar`, formData, {
@@ -72,13 +72,8 @@ const ProfileContent = ({ active }) => {
         },
         withCredentials: true,
       })
-      .then((res) => {
-        console.log(res.data);
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
+      .then(() => window.location.reload(true))
+      .catch((error) => toast.error(error));
   };
 
   const handleSubmitt = (e) => {
@@ -87,134 +82,140 @@ const ProfileContent = ({ active }) => {
   };
 
   return (
-    // Active 1 profile
     <div className="w-full">
+      {/* Profile */}
       {active === 1 && (
-        <>
-          <div className="flex justify-center w-full">
+        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
+          <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                className="h-[150px] w-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
-                src={`${backned_Url}/uploads/${user?.avatar.url}`}
-                alt="asad jan"
+                className="h-36 w-36 rounded-full object-cover border-4 border-blue-500 shadow"
+                src={user?.avatar.url}
+                alt="User Avatar"
               />
-
-              <div className="w-[30px] h-[30px] bg-[#e3e9ee] rounded-full flex items-center justify-center absolute bottom-[5px] right-[5px]">
-                <input
-                  type="file"
-                  id="image"
-                  className="hidden"
-                  onChange={handleImage}
-                />
-                <label className="cursor-pointer" htmlFor="image">
-                  <AiOutlineCamera />
-                </label>
-              </div>
+              <label
+                htmlFor="image"
+                className="absolute bottom-2 right-2 bg-gray-200 p-2 rounded-full cursor-pointer shadow hover:bg-gray-300"
+              >
+                <AiOutlineCamera />
+              </label>
+              <input
+                type="file"
+                id="image"
+                className="hidden"
+                onChange={handleImage}
+              />
             </div>
-          </div>
-          <br />
-          <br />
-          <div className="w-full px-5">
-            <form onSubmit={handleSubmitt} aria-required={true}>
-              <div className="w-full flex flex-wrap gap-2 pb-3">
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2 ">Full Name</label>
-                  <input
-                    required
-                    defaultValue={name || ""}
-                    onChange={(e) => setName(e.target.value)}
-                    type="text"
-                    className={`${styles.input}`}
-                  />
-                </div>
-
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Email Address</label>
-                  <input
-                    required
-                    value={email || " "}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type="text"
-                    className={`${styles.input}`}
-                  />
-                </div>
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Contact Number</label>
-                  <input
-                    required
-                    value={phoneNumber || " "}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    type="text"
-                    className={`${styles.input}`}
-                  />
-                </div>
-
-                <div className=" w-[48%] pt-3">
-                  <label className="block pb-2">Enter your password</label>
-                  <input
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    type="password"
-                    className={`${styles.input}`}
-                  />
-                </div>
-
-                <div className="">
-                  <input
-                    className=" mt-5 w-[250px] h-[40px] border text-center border-[#3a24db] text-[#3a24db] rounded-[3px] cursor-pointer hover:opacity-45 "
-                    required
-                    value={"update"}
-                    type="submit"
-                  />
-                </div>
+            <form
+              onSubmit={handleSubmitt}
+              className="w-full mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Full Name
+                </label>
+                <input
+                  required
+                  defaultValue={user?.name || ""}
+                  onChange={(e) => setName(e.target.value)}
+                  type="text"
+                  className={`${styles.input}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Email
+                </label>
+                <input
+                  required
+                  value={user?.email || ""}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  className={`${styles.input}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Contact Number
+                </label>
+                <input
+                  required
+                  value={user?.phoneNumber || ""}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  type="text"
+                  className={`${styles.input}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Password
+                </label>
+                <input
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type="password"
+                  className={`${styles.input}`}
+                />
+              </div>
+              <div className="col-span-2 flex justify-center mt-3">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+                >
+                  Update
+                </button>
               </div>
             </form>
           </div>
-        </>
+        </div>
       )}
-      {/* Active 2   track order*/}
 
+      {/* Orders */}
       {active === 2 && (
-        <div>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">My Orders</h2>
           <AllOrders userOrders={userOrders} />
         </div>
       )}
 
-      {/* Active 3   Refund order*/}
-
+      {/* Refunds */}
       {active === 3 && (
-        <div>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            Refund Requests
+          </h2>
           <AllRefundOrders userOrders={userOrders} />
         </div>
       )}
 
-      {/* Active 5   track  order*/}
-
+      {/* Track Orders */}
       {active === 5 && (
-        <div>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            Track Orders
+          </h2>
           <TrackOrders userOrders={userOrders} />
         </div>
       )}
 
-      {/* Active 6 change PAssword*/}
-
+      {/* Change Password */}
       {active === 6 && (
-        <div>
+        <div className="bg-white rounded-xl shadow-md p-6">
           <ChangePassword />
         </div>
       )}
 
-      {/* Active 7 Address*/}
-
+      {/* Address */}
       {active === 7 && (
-        <div>
+        <div className="bg-white rounded-xl shadow-md p-6">
           <Address />
         </div>
       )}
     </div>
   );
 };
+
 
 const AllOrders = ({ userOrders }) => {
   const columns = [
@@ -455,7 +456,7 @@ const ChangePassword = () => {
 
     await axios
       .put(
-        `http://localhost:8000/api/user/updatePassword`,
+        `${backned_Url}/api/user/updatePassword`,
         { oldPassword, newPassword, confPassword },
         {
           withCredentials: true,
@@ -486,7 +487,7 @@ const ChangePassword = () => {
           aria-required
           className="flex flex-col items-center"
         >
-          <div className=" w-[100%] md:w-[50%] pt-3 mt-5">
+          <div className=" w-[100%] md:w-[50%] pt-3 mt-3">
             <label className="block pb-2 ">Enter your old Passowrd</label>
             <div className="relative justify-between flex">
               <input
@@ -494,7 +495,7 @@ const ChangePassword = () => {
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 type={visible ? "text" : "password"}
-                className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
+                className={`${styles.input} !w-[95%] mb-3 md:mb-0`}
               />
               {visible ? (
                 <AiOutlineEye
@@ -512,7 +513,7 @@ const ChangePassword = () => {
             </div>
           </div>
 
-          <div className=" w-[100%] md:w-[50%] pt-3 mt-5">
+          <div className=" w-[100%] md:w-[50%] pt-3 mt-3">
             <label className="block pb-2 ">Enter your new Passowrd</label>
             <div className="relative">
               <input
@@ -520,7 +521,7 @@ const ChangePassword = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 type={visible ? "text" : "password"}
-                className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
+                className={`${styles.input} !w-[95%] mb-3 md:mb-0`}
               />
               {visible ? (
                 <AiOutlineEye
@@ -538,7 +539,7 @@ const ChangePassword = () => {
             </div>
           </div>
 
-          <div className=" w-[100%] md:w-[50%] pt-3 mt-5">
+          <div className=" w-[100%] md:w-[50%] pt-3 mt-3">
             <label className="block pb-2 ">Enter your Confirm Passowrd</label>
             <div className="relative">
               <input
@@ -546,7 +547,7 @@ const ChangePassword = () => {
                 value={confPassword}
                 onChange={(e) => setConfPassowrd(e.target.value)}
                 type={visible ? "text" : "password"}
-                className={`${styles.input} !w-[95%] mb-4 md:mb-0`}
+                className={`${styles.input} !w-[95%] mb-3 md:mb-0`}
               />
 
               {visible ? (
@@ -630,11 +631,14 @@ const Address = () => {
       setZipCode("");
       setAddressType("");
     }
+
+    window.location.reload(true);
   };
 
   const deleteAddressController = (id) => {
-    // e.preventDefault();
+
     dispatch(deleteAddress(id));
+        window.location.reload(true);
   };
   return (
     <div className="w-full px-5">

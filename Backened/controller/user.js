@@ -11,59 +11,71 @@ const sendMail = require("../utils/sendMail");
 const { sendToken } = require("../utils/sendToken");
 const { isAuthorized } = require("../middleware/auth");
 const catchAsyncError = require("../middleware/catchAsyncError");
+const cloudinary = require("../cloudinary.js");
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-
+    const { name, email, password, avatar } = req.body;
     const userEmail = await User.findOne({ email });
     if (userEmail) {
-      const filename = req.file.filename;
-      const filepath = `uploads/${filename}`;
-      fs.unlink(filepath, (err) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: "Error deleting file",
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+    // if (userEmail) {
+    //   const filename = req.file.filename;
+    //   const filepath = `uploads/${filename}`;
+    //   fs.unlink(filepath, (err) => {
+    //     if (err) {
+    //       return res.status(500).json({
+    //         success: false,
+    //         message: "Error deleting file",
+    //       });
+    //     }
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Users is already exist",
+    //     });
+    //   });
+    //   return;
+    // }
+
+    // const filename = req.file.filename;
+    // const fileUrl = path.join(filename);
+    const result = await cloudinary.v2.uploader.upload_stream(
+      { folder: "avatar" },
+      async (error, result) => {
+        if (error) return next(new ErrorHandler(error.message, 500));
+        const user = {
+          name: name,
+          email: email,
+          password: password,
+          avatar: {
+            url: result.secure_url,
+            public_id: result.public_id,
+          },
+        };
+        const activationToken = createActivationToken(user);
+        const activationUrl = `http://localhost:5173/activation/${activationToken}`;
+
+        try {
+          await sendMail({
+            email: user.email,
+            subject: "Activate your account",
+            message: `Hello ${user.name} CLick on the link for activation your account ${activationUrl}`,
           });
+          res.status(200).json({
+            success: true,
+            message: `please check your email  to activate your account`,
+          });
+        } catch (error) {
+          return next(new ErrorHandler(error.message, 500));
         }
-        return res.status(400).json({
-          success: false,
-          message: "Users is already exist",
-        });
-      });
-      return;
-    }
-
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
-
-    const user = {
-      name: name,
-      email: email,
-      password: password,
-      avatar: {
-        url: fileUrl,
-        public_id: filename,
-      },
-    };
-    const activationToken = createActivationToken(user);
-    const activationUrl = `http://localhost:5173/activation/${activationToken}`;
-    try {
-      await sendMail({
-        email: user.email,
-        subject: "Activate your account",
-        message: `Hello ${user.name} CLick on the link for activation your account ${activationUrl}`,
-      });
-      res.status(200).json({
-        success: true,
-        message: `please check your email  to activate your account`,
-      });
-    } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
-    }
+      }
+    );
+    result.end(req.file.buffer);
   } catch (error) {
-    console.log(error.message);
-    return next(new ErrorHandler(error.message, 400));
+    return next(new ErrorHandler(error, 400));
   }
 });
 
@@ -222,7 +234,7 @@ router.put(
 router.put(
   "/update-user-avatar",
   isAuthorized,
-  upload.single("image"),
+  upload.single("file"),
   AsyncCatchError(async (req, res, next) => {
     try {
       const existUser = await User.findById(req.user.id);
@@ -230,27 +242,55 @@ router.put(
         return next(new ErrorHandler("User is not found", 400));
       }
 
-      const existAvatarPath = `uploads/${existUser.avatar.url}`;
-      fs.unlink(existAvatarPath, async (err) => {
-        if (err) {
-          return next(new ErrorHandler(err, 400));
+      // const existAvatarPath = `uploads/${existUser.avatar.url}`;
+      // fs.unlink(existAvatarPath, async (err) => {
+      //   if (err) {
+      //     return next(new ErrorHandler(err, 400));
+      //   }
+      // });
+
+      //  Delete old image of the user
+      if (existUser.avatar && existUser.avatar.public_id) {
+        await cloudinary.uploader.destroy(existUser.avatar.public_id);
+      }
+
+      // const newAvatar = {
+      //   public_url: req.file.filename,
+      //   url: req.file.filename,
+      // };
+
+      const result = await cloudinary.v2.uploader.upload_stream(
+        { folder: "avatar" },
+        async (error, result) => {
+          if (error) return next(new ErrorHandler(error, 500));
+
+          // const user = await User.findByIdAndUpdate(
+          //   req.user.id,
+          //   {
+          //     avatar: {
+          //       url: result.secure_url,
+          //       public_id: result.public_id,
+          //     },
+          //   },
+          //   { new: true }
+          // );
+
+          existUser.avatar = {
+            url: result.secure_url,
+            public_id: result.public_id,
+          };
+          await existUser.save({ validateBeforeSave: false });
+
+          res.status(200).json({
+            success: true,
+            existUser,
+          });
         }
-      });
-      const newAvatar = {
-        public_url: req.file.filename,
-        url: req.file.filename,
-      };
-      const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { avatar: newAvatar },
-        { new: true }
       );
 
-      res.status(200).json({
-        success: true,
-        user,
-      });
+      result.end(req.file.buffer);
     } catch (error) {
+      console.log(error);
       return next(new ErrorHandler(error, 400));
     }
   })

@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../../style/style";
 import ProductCardDetails from "../productCardDetails/ProductCardDetails";
+import ReactDOM from "react-dom";
+
 import {
   AiFillHeart,
-  AiFillStar,
   AiOutlineEye,
   AiOutlineHeart,
   AiOutlineShoppingCart,
-  AiOutlineStar,
 } from "react-icons/ai";
-import { backned_Url } from "../../../serverRoute";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToWishList,
@@ -19,6 +18,7 @@ import {
 import { addToCart } from "../../../assets/redux/actions/cart";
 import { toast } from "react-toastify";
 import Rating from "../../product/Rating";
+
 const ProductCard = ({ data }) => {
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ const ProductCard = ({ data }) => {
     } else {
       setClick(false);
     }
-  }, [wishList]);
+  }, [wishList, data._id]);
 
   const addToWishListHandler = (data) => {
     setClick(!click);
@@ -42,9 +42,8 @@ const ProductCard = ({ data }) => {
 
   const addToCartHandler = (data) => {
     const cartData = { ...data, count: 1 };
-    // console.log(cartData);
     dispatch(addToCart(cartData));
-    toast.success("Product  is add in Cart");
+    toast.success("Product is added to Cart");
   };
 
   const removeFromWishListHandler = (data) => {
@@ -54,84 +53,97 @@ const ProductCard = ({ data }) => {
 
   return (
     <>
-      <div className="w-full h-[370px]  bg-amber-50  rounded-lg shadow:sm p-3 relative cursor-pointer">
-        <div className="flex justify-end">
-          <Link to={`/product/${data._id}`}>
+      <div className="w-full h-[400px] bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 relative cursor-pointer p-4 flex flex-col justify-between ">
+        {/* Product Image + Action Icons */}
+        <div className="relative w-full h-[200px] flex justify-center items-center">
+          <Link to={`/product/${data._id}`} className="w-full h-full flex justify-center">
             <img
-              src={`${backned_Url}/uploads/${data.images[0]}`} // changing for  best deals of homepage
-              className="object-contain w-full h-[170px]"
+              src={`${data.images[0].url}`}
+              className="object-contain w-full h-full rounded-md group-hover:scale-105 transition-transform duration-300"
               alt="loading error"
             />
           </Link>
 
-          <div>
+          {/* Action Icons */}
+          <div className="absolute top-3 right-3 flex flex-col gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-lg shadow-md">
             {click ? (
               <AiFillHeart
-                color={click ? "red" : "#333"}
-                size={25}
-                className="mt-3 ml-3 cursor-pointer"
+                color="red"
+                size={22}
+                className="cursor-pointer hover:scale-110 transition"
                 onClick={() => removeFromWishListHandler(data)}
                 title="Remove from wishList"
               />
             ) : (
               <AiOutlineHeart
-                color={click ? "red" : "#333"}
-                size={25}
+                size={22}
+                className="cursor-pointer hover:scale-110 transition"
                 onClick={() => addToWishListHandler(data)}
-                className="mt-3 ml-3 cursor-pointer"
                 title="Add to wishList"
               />
             )}
+
             <AiOutlineEye
-              size={25}
-              className="mt-3 ml-3 cursor-pointer"
-              onClick={() => {
-                setOpen(!open);
-              }}
+              size={22}
+              className="cursor-pointer hover:scale-110 transition"
+              onClick={() => setOpen(!open)}
               title="Quick View"
             />
 
             <AiOutlineShoppingCart
-              size={25}
+              size={22}
+              className="cursor-pointer hover:scale-110 transition"
               onClick={() => addToCartHandler(data)}
-              className="mt-3 ml-3 cursor-pointer"
               title="Add to Cart"
             />
-
-            {open ? <ProductCardDetails setOpen={setOpen} data={data} /> : null}
           </div>
         </div>
 
-        <Link to={`/shop/preview/${data.shopeId}`}>
-          <h1 className={`${styles.shop_name}`}>{data.shop.name}</h1>
-        </Link>
-        <Link to={`/product/${data._id}`}>
-          <h2 className="pb-5 font-[400]">
-            {data.name.length > 40
-              ? data.name.slice(0, 40) + "...."
-              : data.name}
-          </h2>
-        </Link>
-        <div className="flex">
-          <Rating ratings={data.rating} />
-        </div>
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex">
-            <h5 className={`${styles.productDiscountPrice}`}>
-              {data?.originalPrice === 0
-                ? data.originalPrice
-                : data.discountPrice}
-              $
-            </h5>
-            <h4 className={`${styles.price}`}>
-              {data.originalPrice ? data.originalPrice + "$" : null}
-            </h4>
+        {/* Product Info */}
+        <div className="mt-4 flex flex-col flex-1 justify-between">
+          <Link to={`/shop/preview/${data.shopeId}`}>
+            <h1 className={`${styles.shop_name} text-sm text-blue-600 hover:underline`}>
+              {data.shop.name}
+            </h1>
+          </Link>
+
+          <Link to={`/product/${data._id}`}>
+            <h2 className="font-semibold text-gray-800 mt-1 text-base line-clamp-2">
+              {data.name.length > 40 ? data.name.slice(0, 40) + "..." : data.name}
+            </h2>
+          </Link>
+
+          <div className="flex items-center mt-2">
+            <Rating ratings={data.rating} />
           </div>
-          <span className={`${styles.shop_name} text-[17px]`}>
-            {data.sold_out} sold
-          </span>
+
+          {/* Price + Sold Out */}
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h5 className="text-lg font-bold text-pink-600">
+                {data?.originalPrice === 0
+                  ? data.originalPrice
+                  : data.discountPrice}
+                $
+              </h5>
+              {data.originalPrice ? (
+                <h4 className="text-sm text-gray-400 line-through">
+                  {data.originalPrice}$
+                </h4>
+              ) : null}
+            </div>
+            <span className="text-sm font-medium text-gray-500">
+              {data.sold_out} sold
+            </span>
+          </div>
         </div>
       </div>
+
+     {open &&
+  ReactDOM.createPortal(
+    <ProductCardDetails setOpen={setOpen} data={data} />,
+    document.body
+  )}
     </>
   );
 };

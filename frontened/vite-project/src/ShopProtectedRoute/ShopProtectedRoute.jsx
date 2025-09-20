@@ -1,30 +1,20 @@
-import { useSelector } from "react-redux"
-import { Navigate } from "react-router-dom"
-import Cookies from "js-cookie";
-import  Loader from "../component/layout/loader.jsx"
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import Loader from "../component/layout/loader";
 
+const ShopProtectedRoute = ({ children }) => {
+  const { isSeller, isLoading } = useSelector((state) => state.seller);
 
-const ShopProtectedRoute =({children})=>{
-  //  const seller_token = Cookies.get("seller_token");
-  //   // const {isSeller,isLoading} =useSelector((state)=>state.seller);
-  //   if (!seller_token) {
-  //     return <Navigate to={"/shop-login"} replace/>
-  //   }
-  //   return children ;
-
-
-
-  const {isSeller,isLoading} = useSelector((state)=>state.seller);
-
-  if (isLoading === true) {
-    return <Loader/>
-  }else{
-    if (isSeller) {
-          return children;
-        }
-        return <Navigate to={'/shop-login'} replace/>
-
-  }
+  if (isLoading) {
+    return <Loader />;
   }
 
-export default ShopProtectedRoute;
+  if (isSeller) {
+    return children;
+  }
+
+  return <Navigate to="/shop-login" replace />;
+};
+
+
+export default ShopProtectedRoute

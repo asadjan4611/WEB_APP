@@ -17,7 +17,6 @@ const ShopSetting = () => {
   const [zipCode, setZipcode] = useState(seller?.zipCode || "");
   const [avavtar, setAvatar] = useState(null);
   const handleImage = async (e) => {
-    console.log("welecome asad  jan");
     e.preventDefault();
     const file = e.target.files[0];
     setAvatar(file);
@@ -74,7 +73,7 @@ const ShopSetting = () => {
               src={
                 avavtar
                   ? URL.createObjectURL(avavtar)
-                  : `${backned_Url}/uploads/${seller?.avatar.url}`
+                  : `${seller?.avatar.url}`
               }
               alt=""
             />

@@ -17,8 +17,9 @@ import {
   removeFromWishList,
 } from "../../../assets/redux/actions/wishList";
 import axios from "axios";
+
 const ProductCardDetails = ({ setOpen, data }) => {
-  const {user,isAuthenticated} = useSelector((state)=>state.user);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
@@ -26,7 +27,6 @@ const ProductCardDetails = ({ setOpen, data }) => {
   const { cart } = useSelector((state) => state.cart);
   const { wishList } = useSelector((state) => state.wishList);
   const { products } = useSelector((state) => state.products);
-  const [select, setSelect] = useState(false);
 
   useEffect(() => {
     if (wishList && wishList.find((i) => i._id === data._id)) {
@@ -34,47 +34,39 @@ const ProductCardDetails = ({ setOpen, data }) => {
     } else {
       setClick(false);
     }
-  }, [wishList]);
+  }, [wishList, data._id]);
 
-const handleSubmitMessage = async () => {
-  if (isAuthenticated) {
-    const userId = user._id;
-    const sellerId = data?.shop._id;
+  const handleSubmitMessage = async () => {
+    if (isAuthenticated) {
+      const userId = user._id;
+      const sellerId = data?.shop._id;
 
-    // ✅ check if conversation already exists
-    const existingConversation = conversations.find(
-      (c) =>
-        c.members.includes(userId) &&
-        c.members.includes(sellerId)
-    );
+      const existingConversation = conversations.find(
+        (c) => c.members.includes(userId) && c.members.includes(sellerId)
+      );
 
-    if (existingConversation) {
-      // 🔁 redirect to existing chat
-      navigate(`/user-inbox?${existingConversation._id}`);
-    } else {
-      // 🆕 create new conversation
-      const groupTitle = data._id + user._id;
-      try {
-        const res = await axios.post(
-          `${backned_Url}/api/conversation/create-new-conversation`,
-          { groupTitle, userId, sellerId },
-          { headers: { "Content-Type": "application/json" } }
-        );
-
-        navigate(`/user-inbox?${res.data.conversation._id}`);
-      } catch (err) {
-        toast.error(err.response?.data.message);
+      if (existingConversation) {
+        navigate(`/user-inbox?${existingConversation._id}`);
+      } else {
+        const groupTitle = data._id + user._id;
+        try {
+          const res = await axios.post(
+            `${backned_Url}/api/conversation/create-new-conversation`,
+            { groupTitle, userId, sellerId },
+            { headers: { "Content-Type": "application/json" } }
+          );
+          navigate(`/user-inbox?${res.data.conversation._id}`);
+        } catch (err) {
+          toast.error(err.response?.data.message);
+        }
       }
+    } else {
+      toast.error("Please login first to create a conversation");
     }
-  } else {
-    toast.error("Please login first to create a conversation");
-  }
-};
+  };
 
   const DecrementCount = () => {
-    if (count > 1) {
-      setCount(count - 1);
-    }
+    if (count > 1) setCount(count - 1);
   };
 
   const increamentCount = () => {
@@ -91,7 +83,6 @@ const handleSubmitMessage = async () => {
       } else {
         const cartData = { ...data, count: count };
         dispatch(addToCart(cartData));
-        // console.log("cart Data is ",cartData)
         toast.success("Item is added in Cart .. ");
       }
     }
@@ -108,137 +99,129 @@ const handleSubmitMessage = async () => {
   };
 
   const totalReviewLength =
-    products &&
-    products.reduce(
-      (acc, product) =>
-         acc + product.reviews.length, 0);
+    products && products.reduce((acc, product) => acc + product.reviews.length, 0);
   const totalRating =
     products &&
     products.reduce(
       (acc, product) =>
-        acc + product.reviews.reduce(
-          (sum, review) => sum + review.rating, 0),
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
       0
     );
-  const averageRating = totalRating/totalReviewLength || 0;
+  const averageRating = totalRating / totalReviewLength || 0;
 
   return (
     <div className="bg-white">
       {data ? (
-        <div className="flex inset-0 justify-center z-40 bg-[#00000030] items-center fixed">
-          <div className=" w-[90%] 800px:w-[60%] 800px:h-[75vh] bg-white relative shadow-sm p-4  h-[90vh] overflow-y-scroll">
-            <RxCross1
-              size={30}
-              className="absolute top-3 right-3 z-50"
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          {/* Modal container */}
+          <div className="w-[95%] md:w-[70%] lg:w-[60%] bg-white rounded-xl shadow-xl relative overflow-hidden">
+            {/* Close button */}
+            <button
               onClick={() => setOpen(false)}
-            />
+              className="absolute top-3  cursor-pointer right-3 bg-gray-200 hover:bg-gray-300 rounded-full p-2 transition"
+            >
+              <RxCross1 size={22} />
+            </button>
 
-            <div className="w-full flex ">
-              {/* Left side  */}
-              <div className=" block w-[50%] 800px:w-[50%]">
+            <div className="flex flex-col md:flex-row gap-6 p-6 max-h-[85vh] overflow-y-auto">
+              {/* Left section */}
+              <div className="w-full md:w-1/2 flex flex-col items-center">
                 <img
-                  src={`${backned_Url}/uploads/${data.images[0]}`}
-                  className="object-contain h-[70vh] px-2"
-                  alt=""
+                  src={`${data.images[0].url}`}
+                  className="rounded-lg object-cover max-h-[400px] w-full"
+                  alt={data.name}
                 />
-                <Link to={`/shop/preview/${data.shopeId}`}>
-                  <div className="flex">
-                    <img
-                      src={`${backned_Url}/uploads/${data.shop.avatar.url}`}
-                      className="w-[50px] h-[50px] object-cover mt-4 rounded-full mr-2]"
-                      alt=""
-                    />
 
-                    <div>
-                      <h3 className={`${styles.shop_name} top-0 bottom-0 ml-3`}>
-                        {data.shop.name}
-                      </h3>
-
-                      <h3
-                        className={`${styles.shop_name} ml-3 top-0 bottom-0 `}
-                      >
-                        ({averageRating}/{totalReviewLength}) Rating
-                      </h3>
-                    </div>
+                {/* Shop details */}
+                <Link to={`/shop/preview/${data.shopeId}`} className="flex items-center gap-3 mt-4">
+                  <img
+                    src={`${data.shop.avatar.url}`}
+                    className="w-[55px] h-[55px] rounded-full object-cover border border-gray-300"
+                    alt={data.shop.name}
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold">{data.shop.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      ({averageRating.toFixed(1)}/{totalReviewLength}) Rating
+                    </p>
                   </div>
                 </Link>
-                <div
+
+                {/* Message seller button */}
+                <button
                   onClick={handleSubmitMessage}
-                  className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
+                  className="mt-5 w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-2 rounded-lg hover:opacity-90 transition flex items-center justify-center"
                 >
-                  <span className="text-white flex items-center">
-                    Send Message <AiOutlineMessage size={28} className="ml-1" />
-                  </span>
-                </div>
-                <h4 className="text-[15px] text-red-500 font-semibold ml-3 mt-5">
-                  {data.sold_out} Sold out
-                </h4>
+                  Send Message <AiOutlineMessage size={22} className="ml-2" />
+                </button>
+
+                <p className="text-sm text-red-600 font-medium mt-4">{data.sold_out} Sold</p>
               </div>
 
-              {/* right side  */}
-              <div className="flex flex-col w-[50%]">
-                <div className="w-full 600px:w-[50%] pt-5 pl-[5px] pr-[5px]">
-                  <h1 className={`${styles.productTitle} text-[20px]`}>
-                    {data.name}
-                  </h1>
-                  <p className="mt-3">{data.description}</p>
+              {/* Right section */}
+              <div className="w-full md:w-1/2 flex flex-col justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold mb-3">{data.name}</h1>
+                  <p className="text-gray-600 mb-4">{data.description}</p>
+
+                  {/* Price */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl font-bold text-indigo-600">
+                      {data.discountPrice}$
+                    </span>
+                    {data.originalPrice && (
+                      <span className="line-through text-gray-500">
+                        {data.originalPrice}$
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className=" flex pt-3">
-                  <h6 className={`${styles.productDiscountPrice}`}>
-                    {data.discountPrice} $
-                  </h6>
-                  <h4 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
-                  </h4>
-                </div>
-                <div className="flex justify-between pr-3 mt-12 items-center">
-                  <div className="">
+                {/* Quantity & wishlist */}
+                <div className="flex items-center justify-between mt-6">
+                  {/* Quantity control */}
+                  <div className="flex items-center">
                     <button
                       onClick={DecrementCount}
-                      className="bg-gradient-to-r ease-in-out duration-300 transition hover:opacity-75 shadow-lg px-4 py-2 rounded-l font-bold text-white to-teal-500 from-teal-400 "
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-l text-lg font-bold"
                     >
                       -
                     </button>
-                    <span className="bg-gray-200 text-gray-800 font-medium px-4 py-[10px]">
-                      {count}
-                    </span>
+                    <span className="px-5 py-2 bg-gray-100">{count}</span>
                     <button
                       onClick={increamentCount}
-                      className="bg-gradient-to-r ease-in-out duration-300 transition hover:opacity-75 shadow-lg px-4 py-2 rounded-l font-bold text-white to-teal-500 from-teal-400 "
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-r text-lg font-bold"
                     >
                       +
                     </button>
                   </div>
 
+                  {/* Wishlist */}
                   <div>
                     {click ? (
                       <AiFillHeart
-                        color={click ? "red" : "#333"}
-                        size={25}
-                        className="mt-3 ml-2 cursor-pointer"
+                        size={28}
+                        color="red"
+                        className="cursor-pointer hover:scale-110 transition"
                         onClick={() => removeFromWishListHandler(data)}
                       />
                     ) : (
                       <AiOutlineHeart
-                        color={click ? "red" : "#333"}
-                        size={25}
-                        className="mt-3 ml-3 cursor-pointer"
+                        size={28}
+                        className="cursor-pointer hover:scale-110 transition"
                         onClick={() => addToWishListHandler(data)}
-                        title="Add to wishList"
                       />
                     )}
                   </div>
                 </div>
-                <div
+
+                {/* Add to cart */}
+                <button
                   onClick={() => addToCartHandler(data._id)}
-                  className={`${styles.button} mt-4 rounded-[4px] h-11 bg-[#000]`}
+                  className="mt-6 w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg hover:opacity-90 transition flex items-center justify-center"
                 >
-                  <span className="text-white flex items-center">
-                    Add to Cart
-                    <AiOutlineShoppingCart size={28} className="ml-1" />
-                  </span>
-                </div>
+                  Add to Cart <AiOutlineShoppingCart size={22} className="ml-2" />
+                </button>
               </div>
             </div>
           </div>

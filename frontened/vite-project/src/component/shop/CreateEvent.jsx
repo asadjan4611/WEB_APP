@@ -52,13 +52,22 @@ const CreateEvent = () => {
   useEffect(() => {
     if (error) {
       toast.error(error);
+       setCategory("");
+      setDescription("")
+      setStock("");
+      setDiscountPrice("");
+      setOriginalPrice("")
+      setTags("");
+      setName("")
+      setImages("");
     }
-    if (success) {
-      toast.success("Product created Successfully");
-      navigate("/dashboard");
-      window.location.reload();
-    }
-  }, [dispatch, error, success]);
+     if (success) {
+          toast.success("Event created Successfully");
+           
+          // navigate("/dashboard-products")
+        }
+
+  }, [dispatch, error]);
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -85,8 +94,8 @@ const CreateEvent = () => {
     newForm.append("shopeId", seller._id);
     newForm.append("start_date",startDate.toISOString());
     newForm.append("end_date",endDate.toISOString());
-    console.log(newForm);
     dispatch(createEvent(newForm));
+    window.location.reload(true);
   };
 
   return (

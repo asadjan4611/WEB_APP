@@ -1,77 +1,90 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineGift } from "react-icons/ai";
 import { MdOutlineLocalOffer } from "react-icons/md";
-import { useSelector } from "react-redux";
 import { FiPackage, FiShoppingBag } from "react-icons/fi";
-import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
-import { backned_Url } from "../../../serverRoute";
-const DashoardHeader = () => {
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+
+const DashboardHeader = () => {
   const { seller, isSeller } = useSelector((state) => state.seller);
-  // console.log(seller);
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setActive(window.scrollY > 70);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="w-full h-[80px] shadow sticky top-0 left-0 flex items-center justify-between px-4">
-      <div>
-        <Link to={"/dashboard"}>
-          <img
-            src="https://shopo.quomodothemes.website/assets/images/logo.svg"
-            alt=""
-          />
-        </Link>
-      </div>
-      <div className="flex items-center">
-        <div
-          className="flex
-             items-center mr-4"
+    <header
+      className={`w-full h-[70px] fixed top-0 left-0 z-50 flex items-center justify-between px-6 transition-all duration-300 ${
+        active ? "bg-white shadow-lg" : "bg-transparent"
+      }`}
+    >
+      {/* Logo */}
+      <Link to="/dashboard" className="flex items-center">
+        <img
+          src="https://shopo.quomodothemes.website/assets/images/logo.svg"
+          alt="logo"
+          className="h-[40px] w-auto"
+        />
+      </Link>
+
+      {/* Navigation Icons */}
+      <nav className="flex items-center gap-6">
+        <Link
+          to="/dashboard-coupans"
+          className="hover:text-red-600 transition transform hover:scale-110"
         >
-          <Link className="md:block hidden" to={"/dashboard-coupans"}>
-            <AiOutlineGift
-              color="#555"
-              className="mx-5 cursor-pointer"
-              size={30}
+          <AiOutlineGift size={26} />
+        </Link>
+
+        <Link
+          to="/dashboard-events"
+          className="hover:text-red-600 transition transform hover:scale-110"
+        >
+          <MdOutlineLocalOffer size={26} />
+        </Link>
+
+        <Link
+          to="/dashboard-products"
+          className="hover:text-red-600 transition transform hover:scale-110"
+        >
+          <FiShoppingBag size={26} />
+        </Link>
+
+        <Link
+          to="/dashboard-orders"
+          className="hover:text-red-600 transition transform hover:scale-110"
+        >
+          <FiPackage size={26} />
+        </Link>
+
+        {/* Messages with Notification Dot */}
+        <Link
+          to="/dashboard-messages"
+          className="relative hover:text-red-600 transition transform hover:scale-110"
+        >
+          <BiMessageSquareDetail size={25} />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+            3
+          </span>
+        </Link>
+
+        {/* Seller Avatar */}
+        {isSeller && (
+          <Link to={`/seller/${seller._id}`}>
+            <img
+              className="h-[38px] w-[38px] rounded-full object-cover ring-2 ring-red-500 cursor-pointer hover:scale-105 transition"
+              src={seller?.avatar?.url}
+              alt="Seller"
             />
           </Link>
-
-          <Link className="md:block hidden" to={"/dashboard-events"}>
-            <MdOutlineLocalOffer
-              color="#555"
-              className="mx-5 cursor-pointer"
-              size={30}
-            />
-          </Link>
-          <Link className="md:block hidden" to={"/dashboard-products"}>
-            <FiShoppingBag
-              color="#555"
-              className="mx-5 cursor-pointer"
-              size={30}
-            />
-          </Link>
-
-          <Link className="md:block hidden" to={"/dashboard-orders"}>
-            <FiPackage color="#555" className="mx-5 cursor-pointer" size={30} />
-          </Link>
-
-          <Link to={"/dashboard-message"}>
-            <BiMessageSquareDetail
-              color="#555"
-              className="mx-5 cursor-pointer"
-              size={25}
-            />
-          </Link>
-
-          {isSeller && (
-            <Link to={`/seller/${seller._id}`}>
-              <img
-                className="h-[35px] w-[35px] object-cover  rounded-full"
-                src={`${backned_Url}/uploads/${seller?.avatar?.url}`}
-                alt="asad jan"
-              />
-            </Link>
-          )}
-        </div>
-      </div>
-    </div>
+        )}
+      </nav>
+    </header>
   );
 };
 
-export default DashoardHeader;
+export default DashboardHeader;

@@ -10,34 +10,47 @@ const path = require("path");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const { isAuthorized } = require("../middleware/auth.js");
 const Order = require("../model/order");
+const cloudinary = require("../cloudinary.js")
 //create  a product
 router.post(
   "/create-product",
   upload.array("images"),
   AsyncCatchError(async (req, res, next) => {
     try {
-      // console.log("Product is:", Product);
-
-      console.log("welocme at create product function");
       const shopeIdObj = req.body;
       const shopeId = shopeIdObj.shopeId;
       const shop = await Shop.findById(shopeId);
       if (!shop) {
         return next(new ErrorHandler("Shop is Invalid", 400));
-      } else {
-        const files = req.files;
-        const imageUrls = files.map((file) => `${file.filename}`);
+      } 
+         let imageUrls = [];
+
+      // Loop through files and upload to cloudinary
+      for (let i = 0; i < req.files.length; i++) {
+        const result = await new Promise((resolve, reject) => {
+          cloudinary.v2.uploader.upload_stream(
+            { folder: "products" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          ).end(req.files[i].buffer); // send buffer here
+        });
+
+        imageUrls.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+
         const productData = req.body;
-        // console.log("product data is ",productData);
         productData.images = imageUrls;
         productData.shop = shop;
         const product = await Product.create(productData);
-        console.log("product is correcly created ", product);
         res.status(201).json({
           success: true,
           product,
         });
-      }
     } catch (error) {
       console.log(error);
       return next(new ErrorHandler(error, 400));
@@ -72,24 +85,16 @@ router.delete(
       const productId = req.params.id;
       // console.log(productId)
       const productData = await Product.findById(productId);
-      // console.log(productData);
-
-      productData.images.forEach((imageUrl) => {
-        const filepath = path.join(process.cwd(), "uploads", imageUrl);
-        // console.log(filepath);
-        fs.unlink(filepath, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Product deleted sucessfully", filepath);
-          }
-        });
-      });
+    
       // console.log("everything is okay")
 
       if (!productData) {
         return next(new ErrorHandler("product is not exist", 400));
       }
+       productData.images.forEach(async(image) => {
+                 await cloudinary.uploader.destroy(image.public_id)
+            });
+
       const product = await Product.findByIdAndDelete(productId);
       res.status(200).json({
         success: true,

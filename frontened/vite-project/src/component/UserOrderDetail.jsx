@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BsFillBagFill } from "react-icons/bs";
-import styles from "../style/style";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { backned_Url } from "../serverRoute";
@@ -9,242 +8,231 @@ import { RxCross1 } from "react-icons/rx";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { toast } from "react-toastify";
 import axios from "axios";
+
 const UserOrderDetail = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const [status, setStatus] = useState("");
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(1);
   const [comment, setComment] = useState("");
-  const [slectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const { user } = useSelector((state) => state.user);
-  const { userOrders, isLoading } = useSelector((state) => state.order);
+  const { userOrders } = useSelector((state) => state.order);
+
   useEffect(() => {
-    dispatch(getUserOrder(user?._id));
-  }, [dispatch]);
+    if (user?._id) {
+      dispatch(getUserOrder(user._id));
+    }
+  }, [dispatch, user?._id]);
 
   const data = userOrders && userOrders.find((item) => item._id === id);
-  const reviewHandler = async (e) => {
-    const productId = slectedItem._id;
-    const orderId = id;
-    await axios
-      .put(
+
+  const reviewHandler = async () => {
+    if (!selectedItem) return;
+    try {
+      const res = await axios.put(
         `${backned_Url}/api/product/create-new-review`,
         {
           user,
           rating,
           comment,
-          productId,
-          orderId,
+          productId: selectedItem._id,
+          orderId: id,
         },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        console.log("res is ", res);
-        toast.success("Reviewd Successfully");
-        setComment("");
-        setRating(null);
-        setOpen(false);
-      })
-      .catch((error) => {
-        toast.error(error.response?.data?.message);
-        setComment("");
-        setRating(null);
-      });
+        { withCredentials: true }
+      );
+
+      toast.success("Reviewed Successfully");
+      setComment("");
+      setRating(1);
+      setOpen(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+      setComment("");
+      setRating(1);
+    }
   };
 
-  const refundHandler = async (e) => {
-    await axios
-      .put(`${backned_Url}/api/order/refund-order/${id}`, {
-        status: "Refund Processing",
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-      })
-      .catch((error) => {
-        toast.error(error.response?.data?.message);
-      });
+  const refundHandler = async () => {
+    try {
+      const res = await axios.put(
+        `${backned_Url}/api/order/refund-order/${id}`,
+        { status: "Refund Processing" }
+      );
+      toast.success(res.data.message);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Refund request failed");
+    }
   };
 
   return (
-    <div className={`${styles.section} py-4 min-h-screen `}>
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center">
-          <BsFillBagFill color="crimson" size={30} />
-          <h2 className="pl-2 text-[25px]">Order Details</h2>
+    <div className="max-w-6xl mx-auto py-6 px-4 min-h-screen">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b pb-4">
+        <div className="flex items-center gap-2">
+          <BsFillBagFill className="text-indigo-600" size={28} />
+          <h2 className="text-2xl font-semibold">Order Details</h2>
         </div>
-      </div>
-      <div className="w-full flex item-center justify-between pt-6 ">
-        <h5>
-          OrderID <span>{data?._id.slice(0, 8)}</span>
-        </h5>
-        <h5>
-          Placed on : <span>{data?.createdAt?.slice(0, 10)}</span>
+        <h5 className="text-gray-600">
+          Placed on:{" "}
+          <span className="font-medium">{data?.createdAt?.slice(0, 10)}</span>
         </h5>
       </div>
 
-      {/* order items */}
-      <br />
-      <br />
-      {data &&
-        data?.cart.map((item, index) => (
-          <div className="w-full flex items-start mb-5">
+      {/* Order Info */}
+      <div className="flex justify-between items-center mt-4">
+        <h5 className="text-lg">
+          <span className="font-semibold">Order ID:</span>{" "}
+          {data?._id.slice(0, 8)}
+        </h5>
+        <h5 className="text-lg font-semibold text-indigo-600">
+          Total: US${data?.totalPrice}
+        </h5>
+      </div>
+
+      {/* Items */}
+      <div className="mt-6 space-y-5">
+        {data?.cart.map((item, idx) => (
+          <div
+            key={idx}
+            className="flex items-start p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition"
+          >
             <img
-              className="h-[80px] w-[80px]"
-              src={`${backned_Url}/uploads/${item.images[0]}`}
-              alt=""
+              className="h-[80px] w-[80px] rounded object-cover"
+              src={item.images[0].url}
+              alt={item.name}
             />
-            <div className="w-full">
-              <h5 className="pl-3 text-[20px]">{item.name}</h5>
-
-              <h5 className="pl-3 text-[20px]">
-                US$ {item.discountPrice}*{item.count}
-              </h5>
+            <div className="flex-1 ml-4">
+              <h5 className="text-lg font-medium">{item.name}</h5>
+              <p className="text-gray-600">
+                US${item.discountPrice} × {item.count}
+              </p>
             </div>
             {item.isReviewed || item.status === "Delivered" ? null : (
-              <div
-                onClick={() => setOpen(true) || setSelectedItem(item)}
-                className={`${styles.button} text-[#fff]`}
+              <button
+                onClick={() => {
+                  setSelectedItem(item);
+                  setOpen(true);
+                }}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm"
               >
-                Write a Review
-              </div>
+                Write Review
+              </button>
             )}
           </div>
         ))}
+      </div>
 
-      {/* review Open */}
-
+      {/* Review Modal */}
       {open && (
-        <div className="w-full fixed left-0 top-0 h-screen flex items-center justify-center z-50 bg-[#0005] p-3">
-          <div className=" shadow rounded-md bg-[#fff] w-[50%] h-min p-3">
-            <div className="flex w-full justify-end p-1">
-              <RxCross1
-                onClick={() => setOpen(false)}
-                className=" cursor-pointer"
-                size={25}
-              />
-            </div>
-            <h2 className="text-center font-[500] text-[30px] ">
-              Give a Review
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+          <div className="bg-white w-full max-w-lg rounded-lg shadow-lg p-6 relative">
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              <RxCross1 size={22} />
+            </button>
+
+            <h2 className="text-xl font-semibold text-center mb-4">
+              Write a Review
             </h2>
-            <br />
-            <div className="w-full flex  ">
+
+            {/* Item Preview */}
+            <div className="flex items-center gap-3 mb-4">
               <img
-                src={`${backned_Url}/uploads/${slectedItem?.images[0]}`}
-                className="w-[80px] h-[70px] rounded object-cover"
+                src={selectedItem?.images[0].url}
+                className="w-[70px] h-[70px] rounded object-cover"
                 alt=""
               />
               <div>
-                <h4 className="pl-3 text-[20px]">{slectedItem?.name}</h4>
-                <h4 className="pl-3 text-[20px]">
-                  US$ {slectedItem?.discountPrice}*{slectedItem?.count}
-                </h4>
+                <h4 className="text-lg font-medium">{selectedItem?.name}</h4>
+                <p className="text-gray-600">
+                  US${selectedItem?.discountPrice} × {selectedItem?.count}
+                </p>
               </div>
             </div>
-            <br />
-            {/* rating */}
-            <h5 className="pl-3 font-[500px]  text-[20px]">
-              Give a Rating <span className="text-red-400">*</span>
-            </h5>
-            <div className="flex w-full ml-2 pt-1">
+
+            {/* Rating */}
+            <h5 className="font-medium mb-2">Your Rating *</h5>
+            <div className="flex gap-1 mb-4">
               {[1, 2, 3, 4, 5].map((i) =>
                 rating >= i ? (
                   <AiFillStar
                     key={i}
-                    className="mr-1 cursor-pointer"
-                    size={25}
+                    size={28}
+                    className="text-yellow-500 cursor-pointer"
                     onClick={() => setRating(i)}
                   />
                 ) : (
                   <AiOutlineStar
                     key={i}
-                    className="mr-1 cursor-pointer"
-                    size={25}
+                    size={28}
+                    className="text-gray-400 cursor-pointer"
                     onClick={() => setRating(i)}
                   />
                 )
               )}
             </div>
-            <br />
-            <div className="w-full ml-3">
-              <label className="block text-[20px] font-[500">
-                Write a comment{" "}
-                <span className="ml-2 text-[15px]  text-[#00000052]">
-                  (optional)
-                </span>
-              </label>
-              <textarea
-                className="mt-2 w-[95%] p-2 outline-none border"
-                name="comment"
-                id=""
-                cols="20"
-                rows="5"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="How was your  product? write your expression about it "
-              ></textarea>
-            </div>
-            <div
-              onClick={rating > 1 ? reviewHandler : null}
-              className={`${styles.button} mb-2 text-white text-[20px] ml-3 `}
+
+            {/* Comment */}
+            <label className="block mb-1 font-medium">Your Comment</label>
+            <textarea
+              className="w-full border rounded-md p-2 mb-4 focus:ring-2 focus:ring-indigo-400 outline-none"
+              rows="4"
+              placeholder="Share your thoughts..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+
+            {/* Submit */}
+            <button
+              onClick={rating > 0 ? reviewHandler : null}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg"
             >
-              Submit
-            </div>
+              Submit Review
+            </button>
           </div>
         </div>
       )}
 
-      <div className="border-t w-full text-right ">
-        <h5 className="pl-3 text-[20px]">
-          Total Price: <strong>US${data?.totalPrice}</strong>
-        </h5>
-      </div>
-
-      <br />
-      <br />
-      <div className="w-full md:flex items-center ">
-        <div className="w-full md:w-[60%]">
-          <h4 className="pt-2 text-[20px] font-600">Shipping Address:</h4>
-          <h4 className="pt-2 text-[20px] font-600">
-            {data?.shippingAddress.address1 +
-              "            ," +
-              data?.shippingAddress.address2}
-          </h4>
-          <h4 className="pt-2 text-[20px] font-600">
-            {data?.shippingAddress.country}
-          </h4>
-          <h4 className="pt-2 text-[20px] font-600">
-            {data?.shippingAddress.city}
-          </h4>{" "}
-          <h4 className="pt-2 text-[20px] font-600">
-            {data?.user?.phoneNumber}
-          </h4>
+      {/* Shipping & Payment */}
+      <div className="mt-8 grid md:grid-cols-2 gap-6">
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h4 className="text-lg font-semibold mb-2">Shipping Address</h4>
+          <p>{data?.shippingAddress.address1}, {data?.shippingAddress.address2}</p>
+          <p>{data?.shippingAddress.city}, {data?.shippingAddress.country}</p>
+          <p>Phone: {data?.user?.phoneNumber}</p>
         </div>
-        <div className="w-full md:border-none border-t   mt-3 md:w-[40%]">
-          <h4 className="pt-2 text-[20px] font-600">Payment Info :</h4>
-          <h4 className="pt-2 text-[20px] font-600">
-            Status :{" "}
-            {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}
-          </h4>
+
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h4 className="text-lg font-semibold mb-2">Payment Info</h4>
+          <p>
+            Status:{" "}
+            <span className="font-medium text-indigo-600">
+              {data?.paymentInfo?.status || "Not Paid"}
+            </span>
+          </p>
           {data?.status === "Delivered" && (
-            <div
+            <button
               onClick={refundHandler}
-              className={`${styles.button} text-white`}
+              className="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
             >
-              Give a Refund
-            </div>
+              Request Refund
+            </button>
           )}
         </div>
       </div>
-      <br />
-      <Link>
-        <div className={`${styles.button} text-white`}>Send Message</div>
-      </Link>
 
-      <br />
-      <br />
+      {/* Send Message */}
+      <div className="mt-6">
+        <Link to="/user-inbox">
+          <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+            Send Message
+          </button>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -18,18 +18,34 @@ const CreateProduct = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
-  const [originalPrice, setOriginalPrice] = useState();
-  const [discountPrice, setDiscountPrice] = useState();
-  const [stock, setStock] = useState();
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
+  const [stock, setStock] = useState("");
 
   useEffect(() => {
     if (error) {
       toast.error(error);
+      setCategory("");
+      setDescription("")
+      setStock("");
+      setDiscountPrice("");
+      setOriginalPrice("")
+      setTags("");
+      setName("")
+      setImages("");
+
     }
     if (success) {
       toast.success("Product created Successfully");
-       navigate("/dashboard");
-       window.location.reload();
+        setCategory("");
+      setDescription("")
+      setStock("");
+      setDiscountPrice("");
+      setOriginalPrice("")
+      setTags("");
+      setName("")
+      setImages("");
+      // navigate("/dashboard-products")
     }
   }, [dispatch, error, success]);
 
@@ -56,8 +72,8 @@ const CreateProduct = () => {
     newForm.append("discountPrice", discountPrice);
     newForm.append("stock", stock);
     newForm.append("shopeId", seller._id);
-    //  console.log(newForm)
     dispatch(createProduct(newForm));
+    window.location.reload(true);
    
   };
 

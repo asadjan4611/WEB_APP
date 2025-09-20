@@ -1,5 +1,6 @@
 
 import axios from "axios"
+import { backned_Url } from "../../../serverRoute";
 
 
 ///create products
@@ -12,7 +13,7 @@ export const createProduct =(newForm)=>async(dispatch)=>{
             type:"productCreateRequest"
         })
         const config = {headers:{"Content-type":"multipart/form-data"}};
-        const data= axios.post(`http://localhost:8000/api/product/create-product`,newForm,config);
+        const data= axios.post(`${backned_Url}/api/product/create-product`,newForm,config);
         // console.log("data  from backened is",data);
         dispatch({
             type:"productCreateSuccess",
@@ -22,7 +23,7 @@ export const createProduct =(newForm)=>async(dispatch)=>{
         console.log(error);
         dispatch({
             type:"productCreateFailure",
-            payload:error.message
+           payload:error.response?.data?.message
         })
      }
 }
@@ -36,8 +37,7 @@ export const getAllProduct = (id)=>async(dispatch)=>{
      dispatch({
        type: "getAllProductsRequest"
   });
-
-  const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products-shop/${id.id}`);
+  const {data} = await axios.get(`${backned_Url}/api/product/get-all-products-shop/${id}`);
   dispatch({
     type:"getAllProductsSuccess",
     payload:data.products
@@ -61,7 +61,7 @@ export const deleteProduct=(id) =>async(dispatch)=>{
      });
 
 
-     const {data} =await axios.delete(`http://localhost:8000/api/product/delete-shop-product/${id}`);
+     const {data} =await axios.delete(`${backned_Url}/api/product/delete-shop-product/${id}`);
       dispatch({
       type:"deleteProductSucessfully",
       payload:data.message
@@ -85,7 +85,7 @@ export const getAllProductss = ()=>async(dispatch)=>{
        type: "getAllProductssRequest"
   });
 
-  const {data} = await axios.get(`http://localhost:8000/api/product/get-all-products`);
+  const {data} = await axios.get(`${backned_Url}/api/product/get-all-products`);
   dispatch({
     type:"getAllProductssSuccess",
     payload:data.products
@@ -93,8 +93,7 @@ export const getAllProductss = ()=>async(dispatch)=>{
   } catch (error) {
     dispatch({
             type:"productssCreateFailure",
-            payload:error.response.data.message
+            payload:error?.response?.data?.message
         })
-  console.log(error);
   }
 }

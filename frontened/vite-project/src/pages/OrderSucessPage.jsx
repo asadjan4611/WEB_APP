@@ -1,36 +1,63 @@
-import React from 'react'
-import Header from '../component/layout/Header'
-import Footer from '../component/layout/Footer'
+import React from "react";
+import Header from "../component/layout/Header";
+import Footer from "../component/layout/Footer";
 import Lottie from "react-lottie";
-import animationData from "../assets/animations/107043-success.json"
+import animationData from "../assets/animations/107043-success.json";
+import { Link } from "react-router-dom";
+
 const OrderSucessPage = () => {
   return (
-    <div>
-        <Header/>
-        <Suscess/>
-        <Footer/>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        <Success />
+      </div>
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-const Suscess =() =>{
-    const defaultoptions ={
-        loop:false,
-        autoplay:true,
-        animationData:animationData,
-        renderSetting:{
-            preserveAspectRatio:"xMidYMid slice"
-        }
-    }
- return (
-     <div>
-        <Lottie options={defaultoptions} width={300} height={300}/>
-            
-         <h5 className='text-center  mb-14 text-[25px] text-[#000000a1]'>
-           Your order is sucessfull Congratulation!!!!
-         </h5>
-     </div>
- );
-}
+const Success = () => {
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
-export default OrderSucessPage
+  return (
+    <div className="flex flex-col items-center text-center">
+      {/* Success Animation */}
+      <Lottie options={defaultOptions} width={250} height={250} />
+
+      {/* Success Message */}
+      <h5 className="mt-4 text-2xl font-semibold text-green-600">
+        🎉 Your order was placed successfully!
+      </h5>
+      <p className="mt-2 text-gray-600">
+        Thank you for shopping with us. We’ll notify you when your order is on
+        the way.
+      </p>
+
+      {/* Action Buttons */}
+      <div className="mt-6 flex gap-4">
+        <Link
+          to="/profile"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow-md transition"
+        >
+          View Orders
+        </Link>
+        <Link
+          to="/"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg shadow-md transition"
+        >
+          Continue Shopping
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default OrderSucessPage;

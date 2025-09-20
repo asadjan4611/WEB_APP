@@ -87,7 +87,7 @@ function App() {
 
   return (
     <>
-      {/* {stripeapikey && (
+      {stripeapikey && (
         <Elements stripe={loadStripe(stripeapikey)}>
           <Routes>
             <Route
@@ -100,7 +100,7 @@ function App() {
             />
           </Routes>
         </Elements>
-      )} */}
+      )}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />

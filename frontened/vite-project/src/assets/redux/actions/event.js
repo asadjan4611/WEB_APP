@@ -1,4 +1,5 @@
 import axios from "axios";
+import { backned_Url } from "../../../serverRoute";
 
 
 
@@ -10,7 +11,7 @@ export const createEvent =(newForm)=>async(dispatch)=>{
             type:"eventCreateRequest"
         })
         const config = {headers:{"Content-type":"multipart/form-data"}};
-        const data= axios.post(`http://localhost:8000/api/event/create-event`,newForm,config);
+        const data= axios.post(`${backned_Url}/api/event/create-event`,newForm,config);
         // console.log("data  from backened is",data);
         dispatch({
             type:"eventCreateSuccess",
@@ -32,7 +33,7 @@ export const getAllEvennts = (id)=>async(dispatch)=>{
        type: "getAllEventRequest"
   });
 
-  const {data} = await axios.get(`http://localhost:8000/api/event/get-all-events-shop/${id.id}`);
+  const {data} = await axios.get(`${backned_Url}/api/event/get-all-events-shop/${id}`);
   //  console.log(data);
   dispatch({
     type:"getAllEventsSuccess",
@@ -57,7 +58,7 @@ export const deleteEvent=(id) =>async(dispatch)=>{
      });
 
 
-     const {data} =await axios.delete(`http://localhost:8000/api/event/delete-shop-event/${id}`);
+     const {data} =await axios.delete(`${backned_Url}/api/event/delete-shop-event/${id}`);
       dispatch({
       type:"deleteEventSucessfully",
       payload:data.message
@@ -81,7 +82,7 @@ export const getAllShopsEvennts = (id)=>async(dispatch)=>{
        type: "getAllShopEventRequest"
   });
 
-  const {data} = await axios.get(`http://localhost:8000/api/event/get-all-events-shop`);
+  const {data} = await axios.get(`${backned_Url}/api/event/get-all-events-shop`);
   //  console.log(data);
   dispatch({
     type:"getAllShopEventsSuccess",

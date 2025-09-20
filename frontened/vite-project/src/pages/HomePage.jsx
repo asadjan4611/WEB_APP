@@ -9,7 +9,8 @@ import Sponsered from "../component/Route/Sponsered/Sponsered"
 import Footer from "../component/layout/Footer"
 import { useSelector } from 'react-redux';
  const HomePage = () => {
-//   const {isAuthenticated} = useSelector(state=>state.user);
+  const {user} = useSelector(state=>state.user);
+  console.log("user is",user)
 //   console.log("isAuth is true or not",isAuthenticated);
   return (
     <div>
@@ -17,7 +18,7 @@ import { useSelector } from 'react-redux';
       <Hero/>
       <Categories/>
       <BestDeals/>
-      {/* <EventCard/> */}
+      <EventCard/>
       <FeacturedProducts/>
       <Sponsered/>
       <Footer/>

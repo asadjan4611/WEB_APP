@@ -11,119 +11,118 @@ import {
   footerProductLinks,
   footerSupportLinks,
 } from "../../static/data";
+import { Building2, ShoppingBag, LifeBuoy } from "lucide-react"; // new icons
+
 const Footer = () => {
   return (
-    <div className={`bg-[#000] text-white`}>
+    <div className="bg-[#000] text-white">
+      {/* Newsletter Section */}
       <div className="md:flex md:justify-between md:items-center sm:px-12 px-4 bg-[#342ac8] py-7">
-        <h1 className="lg:text-4xl  text-3xl md:mb-6 lg:leading-normal font-semibold md:w-2/5">
+        <h1 className="lg:text-4xl text-3xl md:mb-6 lg:leading-normal font-semibold md:w-2/5">
           <span className="text-[#56d879] mr-2">Subscribe</span>
-          us for get news <br />
-          events and offers
+          to get news <br /> events & offers
         </h1>
 
         <div>
           <input
-            type="text"
+            type="email"
             required
-            className="text-gray-800 bg-amber-50 sm:mr-5 mr-1 lg:mb-4 py-2.5 rounded px-2 focus:outline-none"
+            className="text-gray-800 bg-white sm:mr-5 mr-1 lg:mb-4 py-2.5 rounded px-3 focus:outline-none w-[70%] md:w-auto"
             placeholder="Enter your email"
-            id=""
           />
-          <button className="bg-[#56d879] hover:bg-teal-700 duration-300 px-5 py-2.5 rounded-md text-white md:w-auto w-full">
-            Sumbit
+          <button className="bg-[#56d879] hover:bg-teal-600 duration-300 px-5 py-2.5 rounded-md text-white mt-3 md:mt-0 md:w-auto w-full">
+            Submit
           </button>
         </div>
       </div>
 
-      {/* second footer */}
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 sm:px-8  px-5 py-16 sm:text-center">
+      {/* Links Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 sm:px-8 px-5 py-16 sm:text-center">
+        {/* Logo + Socials */}
         <ul className="px-5 text-center sm:text-start flex sm:block flex-col items-center">
           <img
             src="https://shopo.quomodothemes.website/assets/images/logo.svg"
-            style={{
-              filter: "brightness(0) invert(1)",
-            }}
-            alt=""
+            alt="logo"
+            className="filter brightness-0 invert mb-4"
           />
-          <br />
-          <p>The home and elements needed to create beautiful products.</p>
-          <div className="flex items-center mt-[15px]">
-            <AiFillFacebook size={25} style={{ cursor: "pointer" }} />
-
-            <AiOutlineTwitter
-              size={25}
-              style={{ cursor: "pointer", marginLeft: "15px" }}
-            />
-
-            <AiFillYoutube
-              size={25}
-              style={{ cursor: "pointer", marginLeft: "15px" }}
-            />
-
-            <AiFillGithub
-              size={25}
-              style={{ cursor: "pointer", marginLeft: "15px" }}
-            />
+          <p className="text-gray-400">
+            The home and elements needed to create beautiful products.
+          </p>
+          <div className="flex items-center mt-5 gap-4">
+            {[AiFillFacebook, AiOutlineTwitter, AiFillYoutube, AiFillGithub].map(
+              (Icon, idx) => (
+                <div
+                  key={idx}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-[#56d879] transition cursor-pointer"
+                >
+                  <Icon size={22} />
+                </div>
+              )
+            )}
           </div>
         </ul>
 
+        {/* Company Links */}
         <ul className="text-center sm:text-start">
-          <h1 className="mb-1 font-semibold ">Company</h1>
-          {footerProductLinks.map((link) => {
-            return (
-              <li key={link.name}>
-                <Link
-                  className="leading-5 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
-                  to={link.link}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            );
-          })}
+          <h1 className="mb-2 font-semibold flex items-center gap-2 justify-center sm:justify-start">
+            <Building2 size={18} /> Company
+          </h1>
+          {footerProductLinks.map((link) => (
+            <li key={link.name}>
+              <Link
+                className="leading-6 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
+                to={link.link}
+              >
+                {link.name}
+              </Link>
+            </li>
+          ))}
         </ul>
 
+        {/* Shop Links */}
         <ul className="text-center sm:text-start">
-          <h1 className="mb-1 font-semibold ">Shop</h1>
-          {footercompanyLinks.map((link) => {
-            return (
-              <li key={link.name}>
-                <Link
-                  className="leading-5 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
-                  to={link.link}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            );
-          })}
+          <h1 className="mb-2 font-semibold flex items-center gap-2 justify-center sm:justify-start">
+            <ShoppingBag size={18} /> Shop
+          </h1>
+          {footercompanyLinks.map((link) => (
+            <li key={link.name}>
+              <Link
+                className="leading-6 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
+                to={link.link}
+              >
+                {link.name}
+              </Link>
+            </li>
+          ))}
         </ul>
 
+        {/* Support Links */}
         <ul className="text-center sm:text-start">
-          <h1 className="mb-1 font-semibold ">Support</h1>
-          {footerSupportLinks.map((link) => {
-            return (
-              <li key={link.name}>
-                <Link
-                  className="leading-5 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
-                  to={link.link}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            );
-          })}
+          <h1 className="mb-2 font-semibold flex items-center gap-2 justify-center sm:justify-start">
+            <LifeBuoy size={18} /> Support
+          </h1>
+          {footerSupportLinks.map((link) => (
+            <li key={link.name}>
+              <Link
+                className="leading-6 cursor-pointer text-sm duration-300 hover:text-teal-400 text-gray-400"
+                to={link.link}
+              >
+                {link.name}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
-      <div className="grid grid-cols-1 sm:grid-col-2 lg:grid-cols-3 gap-10 text-center pt-2 text-gray-400 text-sm pb-6">
-        <span> o 2023 Becodemy. All right reserved.</span>
-        <span>Terms.Privacy Policy</span>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center pt-5 text-gray-500 text-sm pb-6">
+        <span>© 2023 Becodemy. All rights reserved.</span>
+        <span className="sm:mx-auto">Terms • Privacy Policy</span>
         <div className="sm:block flex items-center justify-center w-full">
           <img
-            className="mt-3"
+            className="mt-2"
             src="https://hamart-shop.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ffooter-payment.a37c49ac.png&w=640&q=75"
-            alt=""
+            alt="payment methods"
           />
         </div>
       </div>

@@ -250,7 +250,7 @@ const MessageList = ({
       <div className="relative">
         <img
           //   src={`${user?.avatar?.url}`}
-          src={`${backned_Url}/uploads/${user?.avatar?.url}`}
+          src={`${user?.avatar?.url}`}
           className="w-[50px] h-[50px] rounded-full object-cover"
         />
         {online ? (
@@ -282,115 +282,121 @@ const SellerInbox = ({
   sellerId,
   userData,
   scrollRef,
-  setMessages,
   activeStatus,
 }) => {
   return (
-   <div className="flex flex-col h-screen"> {/* full height screen */}
-  {/* header */}
-  <div className="w-full flex p-3 items-center justify-between bg-slate-200 shadow">
-    <div className="flex items-center">
-      <img
-        alt="asad jan"
-        className="w-[50px] h-[50px] rounded-full object-cover"
-        src={`${backned_Url}/uploads/${userData?.avatar?.url}`}
-      />
-      <div className="pl-3">
-        <h1 className="text-[18px] font-[600]">{userData?.name}</h1>
-        <h2 className="text-sm text-gray-500">
-          {activeStatus ? "Active now" : ""}
-        </h2>
-      </div>
-    </div>
-    <AiOutlineArrowRight
-      size={22}
-      className="cursor-pointer"
-      onClick={() => setOpen(false)}
-    />
-  </div>
-
-  {/* chat messages area */}
-  <div className="flex-1 overflow-y-auto bg-slate-100 p-4">
-    {messages &&
-      messages.map((item, index) => (
-        <div
-          key={index}
-          className={`flex w-full my-2 ${
-            item.sender === sellerId ? "justify-end" : "justify-start"
-          }`}
-          ref={scrollRef}
-        >
-          {item.sender !== sellerId && (
-            <img
-              src={`${backned_Url}/uploads/${userData?.avatar?.url}`}
-              className="w-[40px] object-cover h-[40px] rounded-full mr-3"
-              alt="user avatar"
-            />
-          )}
-
+    <div className="flex flex-col h-screen bg-gradient-to-b from-gray-100 to-gray-200">
+      {/* Header */}
+      <div className="sticky top-0 z-10 w-full flex items-center justify-between px-4 py-3 bg-white shadow-md">
+        <div className="flex items-center gap-3">
+          <img
+            src={`${userData?.avatar?.url}`}
+            alt="User avatar"
+            className="w-12 h-12 rounded-full object-cover border"
+          />
           <div>
-            {item.images && (
-              <img
-                src={item.images?.url}
-                className="w-[250px] h-[250px] object-cover rounded-[10px] mb-2"
-                alt="sent media"
-              />
-            )}
-
-            {item.text && (
-              <div
-                className={`w-max p-2 rounded-lg ${
-                  item.sender === sellerId ? "bg-[#000]" : "bg-[#38c776]"
-                } text-white max-w-[70%]`}
-              >
-                <p>{item.text}</p>
-              </div>
-            )}
-
-            <p className="text-[12px] text-[#000000a0] mt-1">
-              {format(item.createdAt)}
+            <h1 className="text-lg font-semibold">{userData?.name}</h1>
+            <p className="text-sm text-gray-500">
+              {activeStatus ? "🟢 Active now" : "⚪ Offline"}
             </p>
           </div>
         </div>
-      ))}
-  </div>
-
-  {/* input form fixed at bottom */}
-  <form
-    className="p-3 w-full flex items-center border-t bg-white"
-    onSubmit={sendMessageHandler}
-  >
-    <div className="mr-3">
-      <input
-        type="file"
-        id="image"
-        className="hidden"
-        onChange={handleImageUpload}
-      />
-      <label htmlFor="image">
-        <TfiGallery className="cursor-pointer" size={22} />
-      </label>
-    </div>
-
-    <div className="flex-1 mb-2 relative">
-      <input
-        type="text"
-        required
-        placeholder="Enter your message..."
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        className="w-full border rounded-full py-2 pl-4 pr-10 outline-none"
-      />
-      <button type="submit">
-        <AiOutlineSend
-          size={20}
-          className="absolute right-3 top-2.5 text-blue-500 cursor-pointer"
+        <AiOutlineArrowRight
+          size={24}
+          className="cursor-pointer text-gray-600 hover:text-black transition"
+          onClick={() => setOpen(false)}
         />
-      </button>
-    </div>
-  </form>
-</div>
+      </div>
 
+      {/* Chat Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+        {messages &&
+          messages.map((item, index) => (
+            <div
+              key={index}
+              className={`flex items-end ${
+                item.sender === sellerId ? "justify-end" : "justify-start"
+              }`}
+              ref={scrollRef}
+            >
+              {/* Show avatar only for receiver */}
+              {item.sender !== sellerId && (
+                <img
+                  src={`${userData?.avatar?.url}`}
+                  alt="User avatar"
+                  className="w-9 h-9 rounded-full object-cover mr-2"
+                />
+              )}
+
+              <div className="flex flex-col max-w-[70%]">
+                {item.images && (
+                  <img
+                    src={item.images?.url}
+                    alt="sent"
+                    className="w-56 h-56 object-cover rounded-xl shadow-md mb-2"
+                  />
+                )}
+
+                {item.text && (
+                  <div
+                    className={`px-4 py-2 rounded-2xl text-sm font-medium shadow ${
+                      item.sender === sellerId
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-br-none"
+                        : "bg-white text-gray-800 border rounded-bl-none"
+                    }`}
+                  >
+                    {item.text}
+                  </div>
+                )}
+                <span className="text-xs text-gray-400 mt-1">
+                  {format(item.createdAt)}
+                </span>
+              </div>
+            </div>
+          ))}
+      </div>
+
+      {/* Input Box */}
+      <form
+        className="sticky bottom-0 w-full flex items-center gap-3 p-3 bg-white border-t"
+        onSubmit={sendMessageHandler}
+      >
+        {/* Upload Image */}
+        <div>
+          <input
+            type="file"
+            id="image"
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+          <label
+            htmlFor="image"
+            className="cursor-pointer text-gray-500 hover:text-blue-500 transition"
+          >
+            <TfiGallery size={22} />
+          </label>
+        </div>
+
+        {/* Message Input */}
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            required
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            className="w-full border rounded-full py-2 pl-4 pr-10 outline-none bg-gray-50 focus:ring-2 focus:ring-blue-400"
+          />
+          <button type="submit">
+            <AiOutlineSend
+              size={20}
+              className="absolute right-3 top-2.5 text-blue-500 hover:text-blue-700 cursor-pointer transition"
+            />
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
+
 export default UserInboxPage;

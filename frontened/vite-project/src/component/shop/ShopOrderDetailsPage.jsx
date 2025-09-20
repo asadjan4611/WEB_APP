@@ -7,6 +7,8 @@ const ShopOrderPage = () => {
   return (
     <div>
           <DashoardHeader/>
+          <br />
+          <br />
           <OrderDetails/>
           <Footer/>
         </div>

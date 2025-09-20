@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Country, State } from "country-state-city";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styles from "../../style/style";
-import { server } from "../../folder/server";
 import { backned_Url } from "../../serverRoute";
+
 const Checkout = () => {
   const { user } = useSelector((state) => state.user);
   const { cart } = useSelector((state) => state.cart);
+
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [userInfo, setUserInfo] = useState(false);
@@ -20,30 +20,32 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const subTotalPrice = cart.reduce(
+    (acc, item) => acc + Number(item.count) * Number(item.discountPrice),
+    0
+  );
+  const shipping = (subTotalPrice * 0.1).toFixed(2);
+  const discountPercentengePrice = couponCodeData ? discountPrice : "";
+  const totalPrice = couponCodeData
+    ? (
+        Number(subTotalPrice) +
+        Number(shipping) -
+        discountPercentengePrice
+      ).toFixed(2)
+    : Number(subTotalPrice) + Number(shipping);
+
   const paymentSubmit = () => {
-    if (
-      address1 === "" ||
-      address2 === "" ||
-      zipCode === null ||
-      country === "" ||
-      city === ""
-    ) {
+    if (!address1 || !address2 || !zipCode || !country || !city) {
       toast.error("Please choose your delivery address!");
     } else {
-      const shippingAddress = {
-        address1,
-        address2,
-        zipCode,
-        country,
-        city,
-      };
-
+      const shippingAddress = { address1, address2, zipCode, country, city };
       const orderData = {
         cart,
         totalPrice,
@@ -53,16 +55,10 @@ const Checkout = () => {
         shippingAddress,
         user,
       };
-
-      // update local storage or save last order
       localStorage.setItem("latestOrder", JSON.stringify(orderData));
       navigate("/payment");
     }
   };
-  const subTotalPrice = cart.reduce(
-    (acc, item) => acc + Number(item.count) * Number(item.discountPrice),
-    0
-  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,21 +69,15 @@ const Checkout = () => {
         if (res.data.coupanCode === null) {
           toast.error("Coupan Code does not exist");
           setCouponCode("");
-          set;
         }
         const shopeId = res.data.coupanCode?.seller._id;
-        // console.log(shopeId)
         const CoupanCodeValue = res.data.coupanCode?.value;
+
         if (res.data.coupanCode !== null) {
           const isCoupanvalid =
             cart && cart.filter((item) => item.shop._id === shopeId);
-          //  console.log(isCoupanvalid)
-          if (!isCoupanvalid) {
-            toast.error("Coupan Code is not valid for this shop");
-            setCouponCode("");
-            setDiscountPrice("");
-          }
-          if (isCoupanvalid.length === 0) {
+
+          if (!isCoupanvalid || isCoupanvalid.length === 0) {
             toast.error("Coupan Code is not valid for this shop");
             setCouponCode("");
             setDiscountPrice("");
@@ -96,9 +86,7 @@ const Checkout = () => {
               (acc, item) => acc + item.count * item.discountPrice,
               0
             );
-
             const discountPrice = (eligiblePrice * CoupanCodeValue) / 100;
-
             setDiscountPrice(discountPrice);
             setCouponCodeData(res.data.coupanCode);
           }
@@ -109,63 +97,50 @@ const Checkout = () => {
       });
   };
 
-  // this  will be shiping price for exapmle if your order is 50$ then shipping will be 5$
-  const shipping = (subTotalPrice * 0.1).toFixed(2);
-
-  const discountPercentengePrice = couponCodeData ? discountPrice : "";
-  const totalPrice = couponCodeData
-    ? (
-        Number(subTotalPrice) +
-        Number(shipping) -
-        discountPercentengePrice
-      ).toFixed(2)
-    : Number(subTotalPrice) + Number(shipping);
-
   return (
-    <div className="w-full flex flex-col items-center py-5">
-      <div className="w-[90%] lg:w-[70%] block md:flex">
-        {/* shipingInfo */}
-        <div className="w-full md:w-[65%]">
-          <ShippingInfo
-            user={user}
-            country={country}
-            setCountry={setCountry}
-            city={city}
-            setCity={setCity}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            address1={address1}
-            setAddress1={setAddress1}
-            address2={address2}
-            setAddress2={setAddress2}
-            zipCode={zipCode}
-            setZipCode={setZipCode}
-          />
-        </div>
+    <div className="w-full flex flex-col items-center py-10 bg-gray-50">
+      <div className="w-[95%] lg:w-[75%] grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Shipping Info */}
+        <ShippingInfo
+          user={user}
+          country={country}
+          setCountry={setCountry}
+          city={city}
+          setCity={setCity}
+          userInfo={userInfo}
+          setUserInfo={setUserInfo}
+          address1={address1}
+          setAddress1={setAddress1}
+          address2={address2}
+          setAddress2={setAddress2}
+          zipCode={zipCode}
+          setZipCode={setZipCode}
+        />
 
-        {/* cartData */}
-        <div className="w-full md:w-[35%] md:mt-0 mt-10">
-          <CartData
-            handleSubmit={handleSubmit}
-            totalPrice={totalPrice}
-            shipping={shipping}
-            subTotalPrice={subTotalPrice}
-            couponCode={couponCode}
-            setCouponCode={setCouponCode}
-            discountPercentengePrice={discountPercentengePrice}
-          />
-        </div>
+        {/* Cart Summary */}
+        <CartData
+          handleSubmit={handleSubmit}
+          totalPrice={totalPrice}
+          shipping={shipping}
+          subTotalPrice={subTotalPrice}
+          couponCode={couponCode}
+          setCouponCode={setCouponCode}
+          discountPercentengePrice={discountPercentengePrice}
+        />
       </div>
+
+      {/* Payment Button */}
       <div
-        className={`${styles.button} w-[150px] md:w-[280px] mt-10`}
+        className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md mt-10 cursor-pointer transition"
         onClick={paymentSubmit}
       >
-        <h5 className="text-white">Go to Payment</h5>
+        Go to Payment
       </div>
     </div>
   );
 };
 
+/* ---------------- Shipping Info ---------------- */
 const ShippingInfo = ({
   user,
   country,
@@ -182,130 +157,134 @@ const ShippingInfo = ({
   setZipCode,
 }) => {
   return (
-    <div className="w-full 800px:w-[95%] bg-white rounded-md p-5 pb-8">
-      <h5 className="text-[18px] font-[500]">Shipping Address</h5>
-      <br />
-      <form>
-        <div className="w-full flex pb-3">
-          <div className="w-[50%]">
-            <label className="block pb-2">Full Name</label>
+    <div className="w-full bg-white rounded-xl shadow-md p-6">
+      <h5 className="text-lg font-semibold text-gray-700 border-b pb-3 mb-4">
+        Shipping Address
+      </h5>
+
+      <form className="space-y-4">
+        {/* Full Name & Email */}
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Full Name</label>
             <input
               type="text"
               value={user && user.name}
               required
-              className={`${styles.input} !w-[95%]`}
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
-          <div className="w-[50%]">
-            <label className="block pb-2">Email Address</label>
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Email</label>
             <input
               type="email"
               value={user && user.email}
               required
-              className={`${styles.input}`}
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
         </div>
 
-        <div className="w-full flex pb-3">
-          <div className="w-[50%]">
-            <label className="block pb-2">Phone Number</label>
+        {/* Phone & Zip */}
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Phone</label>
             <input
               type="number"
-              required
               value={user && user.phoneNumber}
-              className={`${styles.input} !w-[95%]`}
+              required
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
-          <div className="w-[50%]">
-            <label className="block pb-2">Zip Code</label>
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Zip Code</label>
             <input
               type="number"
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
               required
-              className={`${styles.input}`}
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
         </div>
 
-        <div className="w-full flex pb-3">
-          <div className="w-[50%]">
-            <label className="block pb-2">Country</label>
+        {/* Country & City */}
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Country</label>
             <select
-              className="w-[95%] border h-[40px] rounded-[5px]"
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
             >
-              <option className="block pb-2" value="">
-                Choose your country
-              </option>
-              {Country &&
-                Country.getAllCountries().map((item) => (
-                  <option key={item.isoCode} value={item.isoCode}>
-                    {item.name}
-                  </option>
-                ))}
+              <option value="">Choose Country</option>
+              {Country.getAllCountries().map((item) => (
+                <option key={item.isoCode} value={item.isoCode}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </div>
-          <div className="w-[50%]">
-            <label className="block pb-2">City</label>
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">City</label>
             <select
-              className="w-[95%] border h-[40px] rounded-[5px]"
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
               value={city}
               onChange={(e) => setCity(e.target.value)}
             >
-              <option className="block pb-2" value="">
-                Choose your City
-              </option>
-              {State &&
-                State.getStatesOfCountry(country).map((item) => (
-                  <option key={item.isoCode} value={item.isoCode}>
-                    {item.name}
-                  </option>
-                ))}
+              <option value="">Choose City</option>
+              {State.getStatesOfCountry(country).map((item) => (
+                <option key={item.isoCode} value={item.isoCode}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        <div className="w-full flex pb-3">
-          <div className="w-[50%]">
-            <label className="block pb-2">Address1</label>
+        {/* Address */}
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Address 1</label>
             <input
-              type="address"
-              required
+              type="text"
               value={address1}
               onChange={(e) => setAddress1(e.target.value)}
-              className={`${styles.input} !w-[95%]`}
+              required
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
-          <div className="w-[50%]">
-            <label className="block pb-2">Address2</label>
+          <div className="w-1/2">
+            <label className="block text-sm mb-1">Address 2</label>
             <input
-              type="address"
+              type="text"
               value={address2}
               onChange={(e) => setAddress2(e.target.value)}
               required
-              className={`${styles.input}`}
+              className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
             />
           </div>
         </div>
       </form>
+
+      {/* Saved Address */}
       <h5
-        className="text-[18px] cursor-pointer inline-block"
+        className="text-pink-600 mt-4 font-medium cursor-pointer hover:underline"
         onClick={() => setUserInfo(!userInfo)}
       >
-        Choose From saved address
+        Choose from saved address
       </h5>
       {userInfo && (
-        <div>
+        <div className="mt-2 space-y-2">
           {user &&
             user.addresses.map((item, index) => (
-              <div className="w-full flex mt-1">
+              <label
+                key={index}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="checkbox"
-                  className="mr-3"
-                  value={item.addressType}
+                  className="accent-pink-500"
                   onClick={() =>
                     setAddress1(item.address1) ||
                     setAddress2(item.address2) ||
@@ -314,8 +293,8 @@ const ShippingInfo = ({
                     setCity(item.city)
                   }
                 />
-                <h2>{item.addressType}</h2>
-              </div>
+                <span className="text-sm">{item.addressType}</span>
+              </label>
             ))}
         </div>
       )}
@@ -323,6 +302,7 @@ const ShippingInfo = ({
   );
 };
 
+/* ---------------- Cart Data ---------------- */
 const CartData = ({
   handleSubmit,
   totalPrice,
@@ -333,44 +313,49 @@ const CartData = ({
   discountPercentengePrice,
 }) => {
   return (
-    <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">${subTotalPrice}</h5>
+    <div className="w-full bg-white rounded-xl shadow-md p-6">
+      <h5 className="text-lg font-semibold text-gray-700 border-b pb-3 mb-4">
+        Order Summary
+      </h5>
+
+      <div className="space-y-3">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Subtotal</span>
+          <span className="font-medium">${subTotalPrice}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Shipping</span>
+          <span className="font-medium">${shipping}</span>
+        </div>
+        <div className="flex justify-between text-sm border-b pb-3">
+          <span className="text-gray-600">Discount</span>
+          <span className="font-medium text-green-600">
+            {discountPercentengePrice
+              ? "- $" + discountPercentengePrice.toString()
+              : "-"}
+          </span>
+        </div>
+        <div className="flex justify-between text-base font-semibold text-gray-800">
+          <span>Total</span>
+          <span>${totalPrice}</span>
+        </div>
       </div>
-      <br />
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">${shipping}</h5>
-      </div>
-      <br />
-      <div className="flex justify-between border-b pb-3">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">
-          {" "}
-          -{" "}
-          {discountPercentengePrice
-            ? "$" + discountPercentengePrice.toString()
-            : ""}
-        </h5>
-      </div>
-      <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
-      <br />
-      <form onSubmit={handleSubmit}>
+
+      {/* Coupon */}
+      <form onSubmit={handleSubmit} className="mt-6 space-y-3">
         <input
           type="text"
-          className={`${styles.input} h-[40px] pl-2`}
-          placeholder="Coupoun code xxxx-xxxxx"
+          placeholder="Enter coupon code"
           value={couponCode}
           onChange={(e) => setCouponCode(e.target.value)}
-          required
+          className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-400 outline-none"
         />
-        <input
-          className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
-          required
-          value="Apply code"
+        <button
           type="submit"
-        />
+          className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-md font-medium transition"
+        >
+          Apply Code
+        </button>
       </form>
     </div>
   );

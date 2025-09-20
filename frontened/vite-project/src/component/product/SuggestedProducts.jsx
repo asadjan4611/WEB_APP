@@ -1,39 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { productData } from "../../static/data";
 import styles from "../../style/style";
 import ProductCard from "../Route/ProductCard/ProductCard";
 import { useSelector } from "react-redux";
+import { AiOutlineFire } from "react-icons/ai";
 
 const SuggestedProducts = ({ data }) => {
-  // console.log("data is ",data)
-  const [products, setProducts] = useState(null);
-  // console.log("product is ",products);
+  const [products, setProducts] = useState([]);
   const { allproducts } = useSelector((state) => state.products);
 
   useEffect(() => {
-    const d =
-      allproducts && allproducts.filter((i) => i.category === data?.category);
-    setProducts(d);
-  }, []);
-  return (
-    <div>
-      {data ? (
-        <div className={`${styles.section}`}>
-          <h2 className={`${styles.heading} text-[25px] font-[500px] mb-3`}>
-            Related Products
-          </h2>
+    if (allproducts && data?.category) {
+      const related = allproducts.filter(
+        (item) =>
+          item.category === data.category && item._id !== data._id // avoid showing same product
+      );
+      setProducts(related);
+    }
+  }, [allproducts, data]);
 
-          <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-4 lg:gap-[25px] xl:grid-cols-5 xl:gap-[40px] mb-12">
-            {products &&
-              products.map((i, index) => (
-                // <div>
-                //   <h2>asadjan</h2>
-                // </div>
-                <ProductCard data={i} key={index}/>
-              ))}
+  return (
+    <div className={`${styles.section} mt-10`}>
+      {data && (
+        <>
+          {/* Heading */}
+          <div className="flex items-center gap-2 mb-6">
+            <AiOutlineFire className="text-red-500 text-2xl" />
+            <h2 className="text-2xl font-semibold text-gray-900 relative">
+              Related Products
+              <span className="absolute bottom-0 left-0 w-1/2 h-[3px] bg-gradient-to-r from-red-500 to-orange-400 rounded"></span>
+            </h2>
           </div>
-        </div>
-      ) : null}
+
+          {/* Grid */}
+          {products && products.length > 0 ? (
+            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+              {products.map((item, index) => (
+                <div
+                  key={index}
+                  className="transform transition duration-300 hover:scale-105"
+                >
+                  <ProductCard data={item} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-lg mt-10 text-center">
+              No related products found.
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

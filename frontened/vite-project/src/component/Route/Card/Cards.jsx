@@ -1,69 +1,92 @@
 import React from "react";
 import styles from "../../../style/style";
-import  CountDown from "../CountDown/CountDown"
-import { backned_Url } from "../../../serverRoute";
+import CountDown from "../CountDown/CountDown";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import {useDispatch} from "react-redux"
-import {addToCart} from "../../../assets/redux/actions/cart"
-const Cards = ({active,data}) => {
-  const {cart}= useSelector((state)=>state.cart)
+import { addToCart } from "../../../assets/redux/actions/cart";
+import { ShoppingCart, Info } from "lucide-react"; // icons
+
+// this card for event page of home page
+
+const Cards = ({ active, data }) => {
+  const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
-  const addtoCartHandler =(id)=>{
-     const isItemExist = cart && cart.find((i)=>i._id === id);
-     if (isItemExist) {
-       toast.error(" Item is already exist")
-     }else{
+
+  const addtoCartHandler = (id) => {
+    const isItemExist = cart && cart.find((i) => i._id === id);
+    if (isItemExist) {
+      toast.error("Item already in cart");
+    } else {
       dispatch(addToCart(data));
-      toast.success("Item is add in Cart");
-     }
+      toast.success("Item added to cart");
+    }
+  };
 
-
-  }
-  //data is from homepage is correctly working through it  don't need any changing
   return (
-    <>
-      <div className={`w-full p-2 bg-white ${active? "unset":"mb-12"} block lg:flex`}>
-        <div className="w-full lg:w-[50%] m-auto">
-          <img
-            src={`${backned_Url}/uploads/${data.images[0]}`}
-            alt=""
-          />
-        </div>
-        <div className="w-full lg:w-[50%] flex flex-col justify-center ">
-          <h2 className={`${styles.productTitle}`}>{data.name}</h2>
-          <p className="text-[15px] mt-3 mr-4">
-           {data.description}
-          </p>
-          <div className="flex py-2 justify-between">
-            <div className="flex">
+    <div
+      className={`w-full bg-white shadow-md rounded-2xl overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-[1.02] ${
+        active ? "mb-0" : "mb-10"
+      }`}
+    >
+      {/* Product image */}
+      <div className="w-full h-56 md:h-64 overflow-hidden">
+        <img
+          src={data.images[0].url}
+          alt={data.name}
+          className="w-full h-full object-contain hover:scale-110 transition duration-500"
+        />
+      </div>
 
-            <h3 className="font-[500] text-[18px]  text-[#d55b45] pr-3 line-through">
-             {data.originalPrice}
-            </h3>
+      {/* Card content */}
+      <div className="p-4 flex flex-col justify-between">
+        {/* Title */}
+        <h2 className="text-lg md:text-xl font-semibold text-gray-800 truncate">
+          {data.name}
+        </h2>
 
-            <h4 className="font-bold text-[20px] text-[#333] ">
-                {data.discountPrice}
-            </h4>
-            </div>
-            <span className="pr-3 font-[400] text-[17px]  text-[#44a55e]">{data.sold_out} sold</span>
+        {/* Description */}
+        <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+          {data.description}
+        </p>
+
+        {/* Price + sold */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-red-500 text-sm line-through">
+              ${data.originalPrice}
+            </span>
+            <span className="text-green-600 font-bold text-lg">
+              ${data.discountPrice}
+            </span>
           </div>
-          <CountDown data={data}/>
+          <span className="text-sm font-medium text-gray-500">
+            {data.sold_out} sold
+          </span>
+        </div>
 
-           <div className="flex items-center">
-          <Link to={`/product/${data._id}?isEvent=true`}>
-            <div className={`${styles.button} text-[18px] text-white`}>See Details</div>
-          </Link>
-          <div onClick={()=>addtoCartHandler(data._id)}
-            className={`${styles.button} text-[18px] !font-[700px]  text-white ml-5`}
+        {/* Countdown Timer */}
+        <div className="mt-3">
+          <CountDown data={data} />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3 mt-4">
+          <Link
+            to={`/product/${data._id}?isEvent=true`}
+            className="flex items-center justify-center gap-2 w-1/2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
           >
-            Add to Cart
-          </div>
-        </div>
+            <Info size={18} /> Details
+          </Link>
+          <button
+            onClick={() => addtoCartHandler(data._id)}
+            className="flex items-center justify-center gap-2 w-1/2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition"
+          >
+            <ShoppingCart size={18} /> Cart
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

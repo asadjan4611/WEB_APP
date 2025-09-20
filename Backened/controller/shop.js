@@ -12,7 +12,7 @@ const { sendShopToken } = require("../utils/sendShopToken.js");
 const { isAuthorized, isSeller } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const catchAsyncError = require("../middleware/catchAsyncError");
-
+const cloudinary = require("../cloudinary.js");
 //create shop
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
   try {
@@ -20,58 +20,46 @@ router.post("/create-shop", upload.single("file"), async (req, res, next) => {
     const { email } = req.body;
     const sellerEmail = await Shop.findOne({ email });
     if (sellerEmail) {
-      const filename = req.file.filename;
-      const filepath = `uploads/${filename}`;
-      fs.unlink(filepath, (err) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: "Error deleting file",
+      return res.status(400).json({
+        success: false,
+        message: "ShopEmail  is already exist",
+      });
+    }
+    const result = await cloudinary.v2.uploader.upload_stream(
+      { folder: "avatar" },
+      async (error, result) => {
+        if (error) return next(new ErrorHandler(error.message, 500));
+        const seller = {
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          avatar: {
+            url: result.secure_url,
+            public_id: result.public_id,
+          },
+          phoneNumber: req.body.phoneNumber,
+          zipCode: req.body.zipCode,
+          address: req.body.address,
+        };
+        const activationToken = createActivationToken(seller);
+        const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
+
+        try {
+          await sendMail({
+            email: seller.email,
+            subject: "Activate your Shop",
+            message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
           });
+          res.status(200).json({
+            success: true,
+            message: `please check your email  to activate your shop`,
+          });
+        } catch (error) {
+          return next(new ErrorHandler(error.message, 500));
         }
-        return res.status(400).json({
-          success: false,
-          message: "ShopEmail  is already exist",
-        });
-      });
-      return;
-    }
-
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
-    // console.log("hi");
-
-    const seller = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      avatar: {
-        url: fileUrl,
-        public_id: filename,
-      },
-      phoneNumber: req.body.phoneNumber,
-      zipCode: req.body.zipCode,
-      address: req.body.address,
-    };
-
-    // console.log("welcome at middle of  create shop function");
-
-    const activationToken = createActivationToken(seller);
-    const activationUrl = `http://localhost:5173/activation/seller/${activationToken}`;
-
-    try {
-      await sendMail({
-        email: seller.email,
-        subject: "Activate your Shop",
-        message: `Hello ${seller.name} CLick on the link for activation your shop ${activationUrl}`,
-      });
-      res.status(200).json({
-        success: true,
-        message: `please check your email  to activate your shop`,
-      });
-    } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
-    }
+      }
+    );
+    result.end(req.file.buffer);
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   }
@@ -213,24 +201,28 @@ router.put(
           new ErrorHandler("Seller is not found please login first", 400)
         );
       }
+      //  Delete old image of the user
+      if (seller.avatar && seller.avatar.public_id) {
+        await cloudinary.uploader.destroy(seller.avatar.public_id);
+      }
 
-      const existAvatarPath = `uploads/${seller.avatar.url}`;
-      fs.unlink(existAvatarPath, async (err) => {
-        if (err) {
-          return next(new ErrorHandler(err, 403));
+      const result = await cloudinary.v2.uploader.upload_stream(
+        { folder: "avatar" },
+        async (error, result) => {
+          if (error) return next(new ErrorHandler(error, 500));
+          const newAvatar = {
+            url: result.secure_url,
+            public_id: result.public_id,
+          };
+          seller.avatar = newAvatar;
+          await seller.save({ validateBeforeSave: false });
+          res.status(200).json({
+            success: true,
+            seller,
+          });
         }
-      });
-      const newAvatar = {
-        public_url: req.file.filename,
-        url: req.file.filename,
-      };
-
-      seller.avatar = newAvatar;
-      await seller.save({ validateBeforeSave: false });
-      res.status(200).json({
-        success: true,
-        seller,
-      });
+      );
+        result.end(req.file.buffer);
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }
@@ -302,7 +294,6 @@ router.get(
   })
 );
 
-
 // update seller withdraw methods --- sellers
 router.put(
   "/update-payment-methods",
@@ -339,7 +330,7 @@ router.delete(
 
       seller.withdrawMethod = null;
 
-      await seller.save({validateBeforeSave:false});
+      await seller.save({ validateBeforeSave: false });
 
       res.status(201).json({
         success: true,
@@ -350,7 +341,6 @@ router.delete(
     }
   })
 );
-
 
 //get
 module.exports = router;

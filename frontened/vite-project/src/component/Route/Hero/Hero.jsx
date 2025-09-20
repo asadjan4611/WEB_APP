@@ -1,36 +1,46 @@
-import React from 'react';
-import styles from '../../../style/style';
+import React from "react";
+import styles from "../../../style/style";
 import { Link } from "react-router-dom";
+import backgroundImage from "../../../assets/backgroundImage.jpg";
 
 const Hero = () => {
   return (
-    <div 
+    <div
       style={{
-        backgroundImage: "url(https://themes.rslahmed.dev/rafcart/assets/images/banner-2.jpg)",
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
-        backgroundPosition: "center"
+        backgroundPosition: "center",
       }}
-      className={`w-full bg-no-repeat ${styles.noramlFlex} relative min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] 800px:min-h-[80vh]`}
+      className={`w-full relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] 800px:min-h-[90vh] flex items-center`}
     >
-      <div className={`${styles.section} px-4 sm:px-6 md:px-8 w-full md:w-[90%] 800px:w-[60%]`}>
-        <h1 className='text-[28px] sm:text-[32px] md:text-[40px] 800px:text-[60px] leading-tight md:leading-1.2 capitalize text-[#242020] font-bold text-center md:text-left'>
-          Best collection for <br /> home decoration
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/50"></div>
+
+      <div
+        className={`${styles.section} relative z-10 px-4 sm:px-6 md:px-8 w-full md:w-[90%] 800px:w-[65%]`}
+      >
+        {/* Hero Heading */}
+        <h1 className="text-[28px] sm:text-[36px] md:text-[64px] font-extrabold leading-tight text-center md:text-left text-white">
+          Elevate Your <span className="text-pink-400">Home</span> <br /> With
+          Timeless <span className="text-blue-400">Decor</span>
         </h1>
-        <p className='font-normal pt-3 md:pt-5 text-[14px] sm:text-[15px] md:text-[16px] text-[#000000ba] text-center md:text-left'>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          Qui natus <br className="hidden sm:block" /> ipsum perferendis ducimus accusantium laborum,
-          earum placeat adipisci unde!<br className="hidden sm:block" /> Quos, eius. Deleniti nulla natus nesciunt et magni, pariatur ipsam quos.
+
+        {/* Hero Subtitle */}
+        <p className="mt-4 sm:mt-5 md:mt-6 text-[14px] sm:text-[16px] md:text-[18px] text-gray-200 font-light text-center md:text-left max-w-2xl">
+          Discover unique furniture, elegant lighting, and modern accessories to
+          transform your space. <br className="hidden sm:block" /> Quality meets
+          style in every piece — designed for your dream home.
         </p>
+
+        {/* CTA Button */}
         <Link to={"/products"} className="flex justify-center md:justify-start">
-          <div className={`${styles.button} mt-3 sm:mt-4 md:mt-5`}>
-            <span className='text-white font-normal text-[16px] sm:text-[17px] md:text-[18px]'>
-              Shop Now
-            </span>
+          <div className="mt-5 sm:mt-6 md:mt-8 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-medium px-6 sm:px-8 md:px-10 py-3 rounded-full shadow-lg transition transform hover:scale-105">
+            Shop Now
           </div>
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Hero;

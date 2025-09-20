@@ -1,138 +1,141 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
-import Loader from '../layout/loader';
-import { Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Loader from "../layout/loader";
+import { Button, Chip, Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
-import {Link} from "react-router-dom"
-import { deleteEvent, getAllEvennts } from '../../assets/redux/actions/event';
+import { Link } from "react-router-dom";
+import { deleteEvent, getAllEvennts } from "../../assets/redux/actions/event";
 
 const AllEvents = () => {
-  const {isLoading,events}= useSelector((state)=>state.events);
-    const {seller}= useSelector((state)=>state.seller);
-
-//  console.log("events  is ", events);
-
+  const { isLoading, events } = useSelector((state) => state.events);
+  const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
-  useEffect(()=>{
-   dispatch(getAllEvennts(seller._id))
-  },[dispatch]);
 
-  const handleDelete = (params)=>{
-    // console.log(params);
-    dispatch(deleteEvent(params));
-  window.location.reload();
-  }
-  
-   const columns=[
-    {
-      field:"id",
-      headerName:"Product Id",
-      minWidth:150 ,
-      flex:0.7 
-    },{
-      field:"name",
-      headerName:"Name",
-      minWidth:180 ,
-      flex:1.4 
-    },
-    {
-      field:"price",
-      headerName:"Price",
-      minWidth:100 ,
-      flex:0.6 
-    },{
-      field:"Stock",
-      headerName:"Stock",
-      type:"number",
-      minWidth:80 ,
-      flex:0.5 
-    },
-    {
-      field:"sold",
-      headerName:"Sold Out",
-      minWidth:130 ,
-      flex:0.6 ,
-      type:"number" 
+  const [active, setActive] = useState(false);
 
-    },
-    {
-      field:"status",
-      headerName:"Status",
-      minWidth:130 ,
-      flex:0.6 ,
-      type:"string" 
+  useEffect(() => {
+    if (seller?._id) {
+      dispatch(getAllEvennts(seller._id));
+    }
+  }, [dispatch, seller]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setActive(window.scrollY > 70);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleDelete = (id) => {
+    dispatch(deleteEvent(id)).then(() => {
+      dispatch(getAllEvennts(seller._id)); // ✅ refresh events instead of reload
+    });
+  };
+
+  const columns = [
+    { field: "id", headerName: "Event ID", minWidth: 180, flex: 1 },
+    { field: "name", headerName: "Name", minWidth: 180, flex: 1.2 },
+    { field: "price", headerName: "Price", minWidth: 100, flex: 0.6 },
+    { field: "Stock", headerName: "Stock", type: "number", minWidth: 80, flex: 0.5 },
+    { field: "sold", headerName: "Sold", type: "number", minWidth: 100, flex: 0.6 },
+    {
+      field: "status",
+      headerName: "Status",
+      minWidth: 120,
+      flex: 0.7,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={
+            params.value === "Running"
+              ? "success"
+              : params.value === "Ended"
+              ? "error"
+              : "warning"
+          }
+          size="small"
+          variant="outlined"
+        />
+      ),
     },
     {
-      field:"Preview",
-      headerName:" ",
-      minWidth:100 ,
-      flex:0.8,
-      type:"number" ,
-      sortable:false,
-      renderCell:(params)=>{
-        return (
-          <>
-          <Link to={`/product/${params.id}`}>
-          <Button>
-            <AiOutlineEye size={20}/>
+      field: "Preview",
+      headerName: "Preview",
+      minWidth: 120,
+      flex: 0.6,
+      sortable: false,
+      renderCell: (params) => (
+        <Link to={`/product/${params.id}`}>
+          <Button variant="outlined" color="primary" size="small">
+            <AiOutlineEye size={18} />
           </Button>
-          </Link>
-          </>
-        );
-      }
+        </Link>
+      ),
     },
     {
-      field:"Delete",
-      headerName:" ",
-      minWidth:120 ,
-      flex:0.8 ,
-      type:"number",
-      sortable:false,
-      renderCell:(params)=>{
-        return(
-          <>
-          <Button onClick={()=>{handleDelete(params.id)}}>
-            <AiOutlineDelete size={20}/>
-          </Button>
-          </>
-        );
-      }
+      field: "Delete",
+      headerName: "Delete",
+      minWidth: 120,
+      flex: 0.6,
+      sortable: false,
+      renderCell: (params) => (
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={() => handleDelete(params.id)}
+        >
+          <AiOutlineDelete size={18} />
+        </Button>
+      ),
     },
-   ]
+  ];
 
-
-   const row=[];
-   events && events.forEach((item)=>{
-   row.push({
-    id:item._id,
-    name:item.name,
-    price:"US $" + item.discountPrice,
-    Stock:item.stock,
-    status:item.status,
-    sold:item?.sold_out,
-   })
-   });
+  const rows =
+    events?.map((item) => ({
+      id: item._id,
+      name: item.name,
+      price: "US $" + item.discountPrice,
+      Stock: item.stock,
+      status: item.status,
+      sold: item?.sold_out,
+    })) || [];
 
   return (
-   <>
-   {
-    isLoading ? <Loader/>:(
-      <div className='w-full mx-8 pt-1 bg-white'>
-    <DataGrid
-     rows={row}
-     columns={columns}
-     pageSize={10}
-     disableRowSelectionOnClick
-      autoHeight
-     />
-   </div>
-    )
-   }
-   </>
-  )
-}
+    <>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Box className="w-full mx-8 pt-6 mt-15 bg-white rounded-lg shadow-md p-6">
+          <Typography variant="h6" className="mb-4 font-semibold text-gray-800">
+            All Events
+          </Typography>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={10}
+            disableRowSelectionOnClick
+            autoHeight
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f5f5f5",
+                fontWeight: "bold",
+                fontSize: "0.95rem",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#fafafa",
+              },
+              "& .MuiDataGrid-cell": {
+                padding: "10px",
+              },
+            }}
+          />
+        </Box>
+      )}
+    </>
+  );
+};
 
-export default AllEvents
+export default AllEvents;

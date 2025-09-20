@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RxAvatar } from "react-icons/rx";
 import axios from "axios";
-import { server } from "../folder/server";
 import styles from "../style/style";
 import { useNavigate } from "react-router-dom";
 import { Link, Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { backned_Url } from "../serverRoute";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -32,7 +32,7 @@ const Signup = () => {
       const config = { headers: { "Content-Type": "multipart/form-data" } };
 
     const res =await axios
-      .post(`http://localhost:8000/api/user/create-user`, newForm, config);
+      .post(`${backned_Url}/api/user/create-user`, newForm, config);
       // console.log("Your response is ",res.data.message);
       toast.success(res.data.message);
       navigate("/login");
@@ -153,7 +153,7 @@ const Signup = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+            className=" cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
           >
             Signup
           </button>
