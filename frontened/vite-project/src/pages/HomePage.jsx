@@ -8,7 +8,9 @@ import EventCard from "../component/Route/EventCard/EventCard";
 import Sponsered from "../component/Route/Sponsered/Sponsered"
 import Footer from "../component/layout/Footer"
 import { useSelector } from 'react-redux';
+import { backned_Url } from '../serverRoute';
  const HomePage = () => {
+  console.log(backned_Url)
   const {user} = useSelector(state=>state.user);
 //   console.log("isAuth is true or not",isAuthenticated);
   return (
