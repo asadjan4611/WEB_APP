@@ -7,8 +7,8 @@
   "type": "commonjs",
   "main": "backened/server.js",
   "scripts": {
-    "dev": "nodemon backened/server.js",
-    "start": "node backened/server.js",
+    "dev": "nodemon Backened/server.js",
+    "start": "node Backened/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
