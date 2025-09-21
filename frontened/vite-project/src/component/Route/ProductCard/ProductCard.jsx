@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../../style/style";
-import ProductCardDetails from "../ProductCardDetails/ProductCardDetails.jsx";
+import ProductCardDetails from "../ProductCardDetails/ProductCardDetails";
 import ReactDOM from "react-dom";
 
 import {
