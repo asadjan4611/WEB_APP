@@ -42,6 +42,10 @@ app.use("/api/conversation", conversation);
 app.use("/api/messages", messages);
 app.use("/api/withDraw", withDraw);
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 //config
 
 if (process.env.NODE_ENV !== "PROD") {
