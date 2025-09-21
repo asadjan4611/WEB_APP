@@ -17,6 +17,14 @@ app.use(
 app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//config
+
+if (process.env.NODE_ENV !== "PROD") {
+  require("dotenv").config({
+    path: "/config/.env",
+  });
+}
+
 //import Routes
 
 const user = require("./controller/user");
@@ -46,13 +54,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-//config
 
-if (process.env.NODE_ENV !== "PROD") {
-  require("dotenv").config({
-    path: "/config/.env",
-  });
-}
 
 //its for errorhandler
 
