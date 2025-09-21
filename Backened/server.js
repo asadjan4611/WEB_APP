@@ -23,7 +23,7 @@ const server = app.listen(process.env.PORT, () => {
   try {
     console.log(`Server is running on http://localhost:${process.env.PORT}`);
   } catch (error) {
-    console.log("your error is ",error);
+    console.log("your error is ", error);
   }
 });
 
