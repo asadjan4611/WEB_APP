@@ -69,8 +69,8 @@ flowchart LR
     API --> Conversations
     API --> Messages
     API --> Withdraws
-    Frontend <-->|WebSocket| IO
-    IO <--> Frontend
+    Frontend -->|WebSocket| IO
+    IO -->|WebSocket| Frontend
     API -->|Upload streams| CDN
     API -->|Payment Intents| Stripe
     API -->|Order Capture| PayPal
@@ -97,7 +97,7 @@ flowchart LR
 Checkout (Stripe/PayPal/COD)
 ```mermaid
 sequenceDiagram
-    actor Customer
+    participant Customer
     participant FE as Frontend (React)
     participant BE as Backend (Express API)
     participant Stripe as Stripe API
@@ -124,7 +124,7 @@ sequenceDiagram
 Seller Product Management
 ```mermaid
 sequenceDiagram
-    actor Seller
+    participant Seller
     participant FE as Frontend (Dashboard)
     participant BE as Backend (Express API)
     participant CDN as Cloudinary
@@ -140,8 +140,8 @@ sequenceDiagram
 Realtime Chat (Customer ↔ Seller)
 ```mermaid
 sequenceDiagram
-    actor Customer
-    actor Seller
+    participant Customer
+    participant Seller
     participant FE as Frontend (React)
     participant IO as Socket.IO Server
     participant BE as Backend (API)
@@ -418,8 +418,8 @@ flowchart LR
     API --> Conversations
     API --> Messages
     API --> Withdraws
-    Frontend <-->|WebSocket| IO
-    IO <--> Frontend
+    Frontend -->|WebSocket| IO
+    IO -->|WebSocket| Frontend
     API -->|Upload streams| CDN
     API -->|Payment Intents| Stripe
     API -->|Order Capture| PayPal
@@ -529,4 +529,3 @@ sequenceDiagram
     BE-->>Seller: Order delivered
 ```
 
-Note: Mermaid diagrams render on GitHub and most modern Markdown viewers.
